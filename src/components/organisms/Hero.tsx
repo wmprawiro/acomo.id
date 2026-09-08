@@ -1,0 +1,32 @@
+import React from 'react';
+import { EmailSubscription } from '@/components/molecules/EmailSubscription';
+import { Container } from '@/components/atoms/Container';
+
+export const Hero: React.FC = () => {
+  return (
+    <section className="relative flex flex-col items-center justify-center pt-24 md:pt-32 pb-12 w-full">
+      <Container className="flex flex-col items-center">
+        <h1 className="font-bold leading-tight md:leading-[72px] text-[36px] sm:text-[48px] md:text-[72px] text-center text-white max-w-[879px] mb-6">
+          Don't let your balance hit zero, master your cash flow with acomo
+        </h1>
+        
+        <p className="font-medium leading-relaxed md:leading-[28px] text-[16px] md:text-[18px] text-center text-white max-w-[571px] mb-12">
+          Drop your email below to claim your spot in line. We'll give you exclusive early access the second we go live.
+        </p>
+        
+        <div className="w-full flex justify-center z-10">
+          <EmailSubscription />
+        </div>
+
+        {/* Hero Illustration */}
+        <div className="relative mt-16 md:mt-24 w-full pointer-events-none flex justify-center">
+          <img 
+            alt="hero graphic" 
+            className="w-full h-auto md:w-auto md:max-h-[850px] object-contain" 
+            src="/assets/image-1.png" 
+          />
+        </div>
+      </Container>
+    </section>
+  );
+};
