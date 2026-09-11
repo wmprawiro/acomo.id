@@ -10,12 +10,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button 
         ref={ref}
-        className={cn("bg-white hover:bg-gray-200 transition-colors flex h-14 items-center justify-center px-8 py-2 rounded-full shrink-0 cursor-pointer w-full md:w-auto", className)}
+        className={cn(
+          "bg-white hover:bg-gray-200 transition-colors flex h-14 items-center justify-center px-8 py-2 rounded-full shrink-0 cursor-pointer font-medium leading-tight text-sm text-black text-center", 
+          className
+        )}
         {...props}
       >
-        <span className="font-medium leading-tight text-sm text-black text-center whitespace-nowrap">
-          {children}
-        </span>
+        {children}
       </button>
     );
   }
