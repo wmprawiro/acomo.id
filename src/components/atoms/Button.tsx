@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -9,10 +10,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button 
         ref={ref}
-        className={`bg-white hover:bg-gray-200 transition-colors flex h-[56px] items-center justify-center px-[32px] py-[8px] rounded-[999px] shrink-0 cursor-pointer w-full md:w-auto ${className}`}
+        className={cn("bg-white hover:bg-gray-200 transition-colors flex h-14 items-center justify-center px-8 py-2 rounded-full shrink-0 cursor-pointer w-full md:w-auto", className)}
         {...props}
       >
-        <span className="font-medium leading-[20px] text-[14px] text-black text-center whitespace-nowrap">
+        <span className="font-medium leading-tight text-sm text-black text-center whitespace-nowrap">
           {children}
         </span>
       </button>
