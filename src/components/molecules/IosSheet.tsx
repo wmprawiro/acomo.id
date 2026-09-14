@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface IosSheetProps {
@@ -10,12 +10,13 @@ interface IosSheetProps {
   children: ReactNode;
 }
 
-export const IosSheet = ({ isOpen, onClose, title, children }: IosSheetProps) => {
-  const [shouldRender, setShouldRender] = useState(false);
+import { X } from '@phosphor-icons/react';
 
-  useEffect(() => {
-    if (isOpen) setShouldRender(true);
-  }, [isOpen]);
+export const IosSheet = ({ isOpen, onClose, title, children }: IosSheetProps) => {
+  const [shouldRender, setShouldRender] = useState(isOpen);
+  if (isOpen && !shouldRender) {
+    setShouldRender(true);
+  }
 
   const handleAnimationEnd = () => {
     if (!isOpen) setShouldRender(false);
@@ -24,7 +25,7 @@ export const IosSheet = ({ isOpen, onClose, title, children }: IosSheetProps) =>
   if (!shouldRender) return null;
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col justify-end">
+    <div className="absolute inset-0 z-[100] flex flex-col justify-end">
       {/* Backdrop */}
       <div 
         className={cn(
@@ -49,9 +50,7 @@ export const IosSheet = ({ isOpen, onClose, title, children }: IosSheetProps) =>
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-white/20 transition-colors"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <X size={16} weight="bold" />
           </button>
         </div>
 

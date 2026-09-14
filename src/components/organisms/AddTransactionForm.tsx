@@ -2,16 +2,76 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/atoms';
-import { FormField } from '@/components/molecules';
+import { usePreferences, useFinance } from '@/contexts';
+import { CaretRight } from '@phosphor-icons/react';
 
-export const AddTransactionForm = () => {
+interface AddTransactionFormProps {
+  onSuccess?: () => void;
+}
+
+export const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
+  const { currency } = usePreferences();
+  const { wallets, categories, addTransaction } = useFinance();
+  
   const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [title, setTitle] = useState('');
+  const [type, setType] = useState<'expense' | 'income'>('expense');
+  
+  // Set default values if available
+  const [walletId, setWalletId] = useState(wallets[0]?.id || '');
+  
+  // Filter categories by type
+  const availableCategories = categories.filter(c => c.type === type);
+  const [categoryId, setCategoryId] = useState(availableCategories[0]?.id || '');
+
+  // Ensure category matches type when type changes
+  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newType = e.target.value as 'expense' | 'income';
+    setType(newType);
+    const filteredCats = categories.filter(c => c.type === newType);
+    if (filteredCats.length > 0) {
+      setCategoryId(filteredCats[0].id);
+    } else {
+      setCategoryId('');
+    }
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '');
+    if (rawValue.length > 15) return;
+    if (!rawValue) {
+      setAmount('');
+      return;
+    }
+    const formatted = parseInt(rawValue, 10).toLocaleString('id-ID');
+    setAmount(formatted);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // TODO: Implement Supabase Insert Transaction
-    setTimeout(() => setIsLoading(false), 1000);
+    
+    // Convert formatted amount back to number
+    const numericAmount = parseInt(amount.replace(/\D/g, ''), 10) || 0;
+    
+    if (numericAmount > 0 && walletId && categoryId) {
+      addTransaction({
+        title: title.trim() || 'Untitled',
+        amount: numericAmount,
+        type,
+        walletId,
+        categoryId,
+      });
+      
+      // Reset form
+      setAmount('');
+      setTitle('');
+      if (onSuccess) onSuccess();
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -22,12 +82,15 @@ export const AddTransactionForm = () => {
         
         {/* Amount */}
         <div className="flex items-center justify-between p-5 border-b border-white/5 focus-within:bg-white/5 transition-colors">
-          <span className="text-[17px] text-white tracking-tight shrink-0">Amount (Rp)</span>
+          <span className="text-[17px] text-white tracking-tight shrink-0">Amount ({currency})</span>
           <input 
-            type="number" 
+            type="text"
+            inputMode="numeric"
             placeholder="0" 
             required 
-            className="bg-transparent text-right text-[17px] text-white outline-none w-full ml-4 placeholder:text-white/30"
+            value={amount}
+            onChange={handleAmountChange}
+            className="bg-transparent text-right text-[17px] text-white outline-none w-full ml-4 placeholder:text-white/30 truncate"
           />
         </div>
 
@@ -37,6 +100,8 @@ export const AddTransactionForm = () => {
           <input 
             type="date" 
             required 
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
             className="bg-transparent text-right text-[17px] text-white outline-none w-full ml-4 appearance-none"
           />
         </div>
@@ -47,7 +112,9 @@ export const AddTransactionForm = () => {
           <input 
             type="text" 
             placeholder="e.g., Grocery" 
-            required 
+            required
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="bg-transparent text-right text-[17px] text-white outline-none w-full ml-4 placeholder:text-white/30"
           />
         </div>
@@ -55,27 +122,40 @@ export const AddTransactionForm = () => {
         {/* Type */}
         <div className="flex items-center justify-between p-5 border-b border-white/5 focus-within:bg-white/5 transition-colors relative">
           <span className="text-[17px] text-white tracking-tight shrink-0">Type</span>
-          <select className="bg-transparent text-right text-[17px] text-white/70 outline-none w-full ml-4 appearance-none cursor-pointer pr-4 relative z-10" dir="rtl">
+          <select value={type} onChange={handleTypeChange} className="bg-transparent text-right text-[17px] text-white/70 outline-none w-full ml-4 appearance-none cursor-pointer pr-4 relative z-10" dir="rtl">
             <option value="expense" className="bg-[#1C1C1E] text-white text-left">Expense</option>
             <option value="income" className="bg-[#1C1C1E] text-white text-left">Income</option>
           </select>
-          <svg className="w-4 h-4 text-white/30 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+          <CaretRight size={16} weight="bold" className="text-white/30 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        </div>
+
+        {/* Wallet */}
+        <div className="flex items-center justify-between p-5 border-b border-white/5 focus-within:bg-white/5 transition-colors relative">
+          <span className="text-[17px] text-white tracking-tight shrink-0">Wallet</span>
+          <select value={walletId} onChange={(e) => setWalletId(e.target.value)} required className="bg-transparent text-right text-[17px] text-white/70 outline-none w-full ml-4 appearance-none cursor-pointer pr-4 relative z-10" dir="rtl">
+            <option value="" disabled className="bg-[#1C1C1E] text-white/30 text-left">Select Wallet</option>
+            {wallets.map(w => (
+              <option key={w.id} value={w.id} className="bg-[#1C1C1E] text-white text-left">{w.name}</option>
+            ))}
+          </select>
+          <CaretRight size={16} weight="bold" className="text-white/30 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
         {/* Category */}
         <div className="flex items-center justify-between p-5 focus-within:bg-white/5 transition-colors relative">
           <span className="text-[17px] text-white tracking-tight shrink-0">Category</span>
-          <select className="bg-transparent text-right text-[17px] text-white/70 outline-none w-full ml-4 appearance-none cursor-pointer pr-4 relative z-10" dir="rtl">
-            <option value="food" className="bg-[#1C1C1E] text-white text-left">Food & Dining</option>
-            <option value="transport" className="bg-[#1C1C1E] text-white text-left">Transportation</option>
-            <option value="salary" className="bg-[#1C1C1E] text-white text-left">Salary</option>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required className="bg-transparent text-right text-[17px] text-white/70 outline-none w-full ml-4 appearance-none cursor-pointer pr-4 relative z-10" dir="rtl">
+            <option value="" disabled className="bg-[#1C1C1E] text-white/30 text-left">Select Category</option>
+            {availableCategories.map(c => (
+              <option key={c.id} value={c.id} className="bg-[#1C1C1E] text-white text-left">{c.name}</option>
+            ))}
           </select>
-          <svg className="w-4 h-4 text-white/30 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+          <CaretRight size={16} weight="bold" className="text-white/30 absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none" />
         </div>
 
       </div>
 
-      <Button type="submit" className="w-full mt-4 bg-white text-black hover:bg-gray-200 py-6 text-[17px] rounded-[16px] shadow-xl" disabled={isLoading}>
+      <Button type="submit" className="w-full mt-4 bg-white text-black hover:bg-gray-200 py-6 text-[17px] rounded-[16px] shadow-xl" disabled={isLoading || !walletId || !categoryId || !amount || parseInt(amount.replace(/\D/g, ''), 10) === 0}>
         {isLoading ? 'Saving...' : 'Save Transaction'}
       </Button>
     </form>

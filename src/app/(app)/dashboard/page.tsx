@@ -1,15 +1,29 @@
-import { DashboardStats, TransactionList, ExpenseChart } from '@/components/organisms';
+import { DashboardStats, TransactionList, ExpenseChart, CategoryPieChart, WalletCarousel } from '@/components/organisms';
 import Link from 'next/link';
 import { MaskingProvider } from '@/contexts';
 
 export default function DashboardPage() {
   return (
     <MaskingProvider>
-      <div className="space-y-8">
-        {/* Overview Cards */}
+      <div className="space-y-6">
+        {/* Balance Overview */}
         <section>
           <DashboardStats />
+        </section>
+
+        {/* Wallets */}
+        <section>
+          <WalletCarousel />
+        </section>
+
+        {/* Weekly Expense Bar Chart */}
+        <section>
           <ExpenseChart />
+        </section>
+
+        {/* Spending by Category Donut Chart */}
+        <section>
+          <CategoryPieChart />
         </section>
 
         {/* Recent Transactions */}

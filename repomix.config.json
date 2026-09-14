@@ -1,0 +1,31 @@
+{
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "showLineNumbers": true,
+    "copyToClipboard": false,
+    "instructionFilePath": "AGENTS.md"
+  },
+  "include": [
+    "src/**",
+    "*.config.*",
+    "package.json",
+    "tsconfig.json"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "customPatterns": [
+      ".next/**",
+      "node_modules/**",
+      "*.lock",
+      "package-lock.json",
+      "public/**",
+      "repomix-output*",
+      "*.mjs",
+      ".env*"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

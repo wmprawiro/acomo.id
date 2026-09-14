@@ -1,17 +1,35 @@
-import { cn } from '@/lib/utils';
+'use client';
 
-const MOCK_CATEGORIES = [
-  { id: '1', label: 'Food & Dining', spent: 2000000, limit: 3000000, color: 'bg-rose-500' },
-  { id: '2', label: 'Transportation', spent: 1200000, limit: 1500000, color: 'bg-amber-500' },
-  { id: '3', label: 'Entertainment', spent: 800000, limit: 1000000, color: 'bg-sky-500' },
-  { id: '4', label: 'Utilities', spent: 500000, limit: 500000, color: 'bg-emerald-500' },
-];
+import { cn, formatCurrency } from '@/lib/utils';
+import { useFinance, usePreferences } from '@/contexts';
+import { useMemo } from 'react';
 
 export const CategoryList = () => {
+  const { categories, transactions } = useFinance();
+  const { currency } = usePreferences();
+
+  const categoryStats = useMemo(() => {
+    return categories
+      .filter(c => c.type === 'expense')
+      .map(c => {
+        const spent = transactions
+          .filter(t => t.categoryId === c.id)
+          .reduce((acc, t) => acc + t.amount, 0);
+        return {
+          ...c,
+          spent,
+        };
+      })
+      .sort((a, b) => b.spent - a.spent); // sort by highest spent
+  }, [categories, transactions]);
+
   return (
     <div className="space-y-4">
-      {MOCK_CATEGORIES.map((cat) => {
-        const percentage = Math.min((cat.spent / cat.limit) * 100, 100);
+      {categoryStats.length === 0 && (
+        <p className="text-white/50 text-center py-4 text-sm">No categories found.</p>
+      )}
+      {categoryStats.map((cat) => {
+        const percentage = cat.limit && cat.limit > 0 ? Math.min((cat.spent / cat.limit) * 100, 100) : 0;
         const isNearLimit = percentage > 85;
 
         return (
@@ -19,23 +37,27 @@ export const CategoryList = () => {
             <div className="flex justify-between items-center mb-3">
               <div className="flex items-center gap-3">
                 <div className={cn("w-3 h-3 rounded-full", cat.color)} />
-                <span className="text-[17px] font-semibold text-white tracking-tight">{cat.label}</span>
+                <span className="text-[17px] font-semibold text-white tracking-tight">{cat.name}</span>
               </div>
               <span className="text-[17px] text-white/50">
-                {percentage.toFixed(0)}%
+                {cat.limit ? `${percentage.toFixed(0)}%` : 'No Limit'}
               </span>
             </div>
             
-            <div className="w-full h-2.5 bg-black/40 rounded-full overflow-hidden mb-3">
-              <div 
-                className={cn("h-full rounded-full transition-all duration-500", isNearLimit ? 'bg-rose-500' : cat.color)} 
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
+            {cat.limit && cat.limit > 0 && (
+              <div className="w-full h-2.5 bg-black/40 rounded-full overflow-hidden mb-3">
+                <div 
+                  className={cn("h-full rounded-full transition-all duration-500", isNearLimit ? 'bg-rose-500' : cat.color)} 
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+            )}
 
             <div className="flex justify-between text-[13px] font-medium">
-              <span className="text-white">Rp {cat.spent.toLocaleString('id-ID')}</span>
-              <span className="text-white/50">of Rp {cat.limit.toLocaleString('id-ID')}</span>
+              <span className="text-white">{formatCurrency(cat.spent, currency)}</span>
+              {cat.limit && cat.limit > 0 && (
+                <span className="text-white/50">of {formatCurrency(cat.limit, currency)}</span>
+              )}
             </div>
           </div>
         );

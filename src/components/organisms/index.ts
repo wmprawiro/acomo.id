@@ -12,3 +12,4 @@ export { AddTransactionForm } from './AddTransactionForm';
 export { CategoryList } from './CategoryList';
 export { ExpenseChart } from './ExpenseChart'; 
 export { CategoryPieChart } from './CategoryPieChart'; 
+export { WalletCarousel } from './WalletCarousel';

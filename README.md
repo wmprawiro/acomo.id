@@ -34,3 +34,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## AI Agent Context Generation
+
+This project utilizes both **Repomix** and **Graphify** to easily provide complete codebase context to AI agents (like Claude, Cursor, Windsurf, or Gemini).
+
+### 1. Repomix
+Repomix bundles your entire codebase into a single AI-friendly XML/Markdown file.
+- **Command:** `npx repomix`
+- **Output:** `repomix-output.xml` (or `.md`)
+- **Usage:** Drag and drop the output file into your AI chat to give it instant knowledge of all project files, ignoring `node_modules` and `.next`.
+- **Config:** See `repomix.config.json`
+
+### 2. Graphify
+Graphify generates a visual or text-based dependency graph and repository map, allowing AI agents to understand how components and files relate to each other without reading every single line of code.
+- **Output Directory:** `graphify-out/`
+- **Usage:** Provide the graph summaries to your AI agent for architectural planning and impact analysis before starting a large refactor.

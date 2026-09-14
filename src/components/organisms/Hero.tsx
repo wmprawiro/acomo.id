@@ -7,7 +7,7 @@ export const Hero: React.FC = () => {
     <section className="relative flex flex-col items-center justify-center pt-24 md:pt-32 pb-12 w-full">
       <Container className="flex flex-col items-center">
         <h1 className="font-bold leading-tight md:leading-none text-4xl sm:text-5xl md:text-7xl text-center text-white max-w-4xl mb-6">
-          Don't let your balance hit zero, master your cash flow with acomo
+          Don&apos;t let your balance hit zero, master your cash flow with acomo
         </h1>
         
         <p className="font-medium leading-relaxed md:leading-7 text-base md:text-lg text-center text-white max-w-xl mb-12">

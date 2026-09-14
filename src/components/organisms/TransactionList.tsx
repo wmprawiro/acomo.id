@@ -1,26 +1,33 @@
-import { TransactionItem } from '@/components/molecules';
+'use client';
 
-// Dummy data for now
-const MOCK_TRANSACTIONS = [
-  { id: '1', title: 'Gaji Bulanan', categoryName: 'Salary', date: '10 Sep 2026', amount: 'Rp 20.000.000', type: 'income' as const },
-  { id: '2', title: 'Makan Siang', categoryName: 'Food & Dining', date: '11 Sep 2026', amount: 'Rp 50.000', type: 'expense' as const },
-  { id: '3', title: 'Beli Kopi', categoryName: 'Food & Dining', date: '11 Sep 2026', amount: 'Rp 35.000', type: 'expense' as const },
-  { id: '4', title: 'Tagihan Listrik', categoryName: 'Utilities', date: '12 Sep 2026', amount: 'Rp 500.000', type: 'expense' as const },
-];
+import { TransactionItem } from '@/components/molecules';
+import { useFinance } from '@/contexts';
 
 export const TransactionList = () => {
+  const { transactions, categories } = useFinance();
+
   return (
     <div className="flex flex-col">
-      {MOCK_TRANSACTIONS.map((trx) => (
-        <TransactionItem
-          key={trx.id}
-          title={trx.title}
-          categoryName={trx.categoryName}
-          date={trx.date}
-          amount={trx.amount}
-          type={trx.type}
-        />
-      ))}
+      {transactions.length === 0 ? (
+        <div className="py-8 text-center text-white/40 text-sm">No transactions yet.</div>
+      ) : (
+        transactions.map((trx) => {
+          const category = categories.find(c => c.id === trx.categoryId);
+          const dateObj = new Date(trx.date);
+          const formattedDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+          return (
+            <TransactionItem
+              key={trx.id}
+              title={trx.title}
+              categoryName={category?.name || 'Unknown'}
+              date={formattedDate}
+              amount={trx.amount}
+              type={trx.type}
+            />
+          );
+        })
+      )}
     </div>
   );
 };

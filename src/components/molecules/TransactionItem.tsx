@@ -1,14 +1,15 @@
 "use client";
 
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { forwardRef } from 'react';
-import { useMasking } from '@/contexts';
+import { useMasking, usePreferences } from '@/contexts';
+import { ArrowUp, ArrowDown } from '@phosphor-icons/react';
 
 export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   categoryName: string;
   date: string;
-  amount: string;
+  amount: number;
   type: 'income' | 'expense';
   icon?: React.ReactNode;
 }
@@ -16,6 +17,11 @@ export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElemen
 export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
   ({ className, title, categoryName, date, amount, type, icon, ...props }, ref) => {
     const { isVisible } = useMasking();
+    const { currency } = usePreferences();
+    
+    const hiddenText = currency === 'IDR' ? 'Rp *********' : (currency === 'USD' ? '$ ***' : '€ ***');
+    const formattedAmount = formatCurrency(amount, currency);
+
     return (
       <div
         ref={ref}
@@ -25,30 +31,39 @@ export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
         )}
         {...props}
       >
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 shrink-0 border border-white/5">
-            {icon || <span className="w-5 h-5 block bg-white/20 rounded-full" />}
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <div
+            className={cn(
+              "w-6 h-6 rounded-full flex items-center justify-center shrink-0",
+              type === 'income'
+                ? "bg-emerald-500/20 text-emerald-400"
+                : "bg-rose-500/20 text-rose-400"
+            )}
+          >
+            {icon || (
+              type === 'income' ? <ArrowUp size={14} weight="bold" /> : <ArrowDown size={14} weight="bold" />
+            )}
           </div>
-          <div>
-            <p className="text-[17px] text-white tracking-tight">{title}</p>
-            <p className="text-[13px] text-white/50 mt-0.5">
+          <div className="min-w-0 flex-1">
+            <p className="text-[15px] text-white tracking-tight font-medium truncate">{title}</p>
+            <p className="text-[12px] text-white/50 mt-0.5 truncate">
               {categoryName} • {date}
             </p>
           </div>
         </div>
         <div
           className={cn(
-            'text-[17px] font-semibold shrink-0 ml-4',
+            'text-[15px] font-semibold shrink-0 ml-4 text-right whitespace-nowrap',
             type === 'income' ? 'text-emerald-400' : 'text-white'
           )}
         >
           {isVisible ? (
             <>
               {type === 'income' ? '+' : '-'}
-              {amount}
+              {formattedAmount}
             </>
           ) : (
-            'Rp *********'
+            hiddenText
           )}
         </div>
       </div>

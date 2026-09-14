@@ -16,3 +16,7 @@ export type { CategoryBadgeProps } from './CategoryBadge';
 export { FormField } from './FormField';
 export type { FormFieldProps } from './FormField';
 export { IosSheet } from './IosSheet'; 
+export { BudgetProgress } from './BudgetProgress';
+
+export { LegalSheet } from './LegalSheet';
+export type { LegalSheetProps, LegalSheetType } from './LegalSheet';

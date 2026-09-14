@@ -42,3 +42,10 @@ next-env.d.ts
 
 # local docs / planning
 /Doc
+
+# AI tools output (repomix, graphify)
+repomix-output*
+graphify-out/
+graph.html
+graph.json
+GRAPH_REPORT.md

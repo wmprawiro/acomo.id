@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export interface DividerProps extends React.HTMLAttributes<HTMLHRElement> {}
+export type DividerProps = React.HTMLAttributes<HTMLHRElement>;
 
 export const Divider = forwardRef<HTMLHRElement, DividerProps>(
   ({ className, ...props }, ref) => {

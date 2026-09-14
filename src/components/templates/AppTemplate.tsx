@@ -31,7 +31,7 @@ export const AppTemplate = ({ children }: { children: React.ReactNode }) => {
           onClose={() => setIsAddOpen(false)} 
           title="New Transaction"
         >
-          <AddTransactionForm />
+          <AddTransactionForm onSuccess={() => setIsAddOpen(false)} />
         </IosSheet>
       </div>
     </div>
