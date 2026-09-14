@@ -16,7 +16,7 @@ export const TopNav = () => {
   };
 
   return (
-    <header className="absolute top-0 left-0 right-0 h-[72px] flex items-center justify-between px-6 z-40 bg-transparent pointer-events-auto">
+    <header className="absolute top-0 left-0 right-0 h-[72px] flex items-center justify-between px-6 z-40 bg-gradient-to-b from-black/80 to-transparent pointer-events-auto">
       <h2 className="text-[28px] font-bold text-white tracking-tight">{getTitle()}</h2>
       <div className="flex items-center gap-5">
         {/* Profile Avatar as Link */}

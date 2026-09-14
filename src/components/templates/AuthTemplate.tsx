@@ -5,8 +5,7 @@ export const AuthTemplate = ({ children }: { children: React.ReactNode }) => {
       {/* Bagian Header: Flex-1 akan membuatnya mengisi sisa ruang dan mendorong dirinya (dan isinya) ke tengah layar */}
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-[400px] mx-auto">
         <div className="text-center">
-          <h1 className="text-[36px] leading-tight font-bold text-foreground tracking-tight">acomo.</h1>
-          <p className="text-[17px] text-white/50 mt-3">Master your cash flow</p>
+          <h1 className="text-[36px] leading-tight font-bold text-foreground tracking-tight">acomo</h1>
         </div>
       </div>
 

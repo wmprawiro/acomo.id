@@ -1,6 +1,7 @@
 'use client';
 
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useMasking } from '@/contexts';
 
 const data = [
   { day: 'Mon', amount: 150000 },
@@ -13,12 +14,14 @@ const data = [
 ];
 
 export const ExpenseChart = () => {
+  const { isVisible } = useMasking();
+
   return (
     <div className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl p-6 rounded-[24px] border border-white/10 shadow-2xl mt-4">
       <div className="flex justify-between items-end mb-6">
         <div>
           <h3 className="text-white/60 text-sm font-medium mb-1">This Week</h3>
-          <p className="text-2xl font-bold text-white">Rp 1.880.000</p>
+          <p className="text-2xl font-bold text-white">{isVisible ? 'Rp 1.880.000' : 'Rp *********'}</p>
         </div>
         <div className="text-xs font-medium text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full">
           +12%
@@ -42,7 +45,7 @@ export const ExpenseChart = () => {
                   return (
                     <div className="bg-[#2C2C2E] px-3 py-2 rounded-xl shadow-xl border border-white/10">
                       <p className="text-white font-semibold text-sm">
-                        Rp {(payload[0].value as number).toLocaleString('id-ID')}
+                        {isVisible ? `Rp ${(payload[0].value as number).toLocaleString('id-ID')}` : 'Rp *********'}
                       </p>
                     </div>
                   );

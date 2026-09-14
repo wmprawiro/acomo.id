@@ -14,30 +14,30 @@ export const FAQ_DATA: FaqItem[] = [
   },
   {
     id: 'bank-connection',
-    title: "Will acomo connect to my bank account?",
-    content: "Yes, acomo will securely integrate with major banks and financial institutions so you can sync your transactions automatically in real-time.",
+    title: "Can I connect acomo to my bank account?",
+    content: "Currently, acomo does not support automatic bank connections. All transactions and cash flows are recorded manually to give you full control and awareness over every entry.",
   },
   {
     id: 'data-security',
     title: "Is my financial data secure?",
-    content: "Absolutely. We use bank-level encryption and strict security protocols to ensure that your financial data remains completely private and safe at all times.",
+    content: "Absolutely. We use industry-standard encryption and strict security protocols to ensure that your financial data remains completely private and safe at all times.",
   },
   {
     id: 'pricing',
-    title: "How much will acomo cost?",
-    content: "Our early access users will receive a special lifetime discount. We will offer a generous free tier as well as premium plans with advanced forecasting features.",
+    title: "How much does acomo cost?",
+    content: "You can start using acomo right away for free. As we grow, we may introduce premium plans with advanced features, but our core tracking tools will always remain accessible.",
   },
   {
-    id: 'early-access',
-    title: "How do I get early access?",
-    content: "Simply enter your email address in the form at the top of the page. We'll notify you the moment we launch our exclusive beta.",
+    id: 'how-to-start',
+    title: "How do I get started?",
+    content: "Simply click the 'Continue with Google' button at the top of the page. You can immediately access the dashboard and start managing your cash flow without any waitlist.",
   },
 ];
 
 export const FOOTER_LINKS: FooterLink[] = [
-  { id: 'support', label: "Support", href: "#" },
-  { id: 'privacy', label: "Privacy Policy", href: "#" },
-  { id: 'terms', label: "Terms of Service", href: "#" },
-  { id: 'security', label: "Security", href: "#" },
+  { id: 'support', label: "Support", href: "mailto:support@acomo.id" },
+  { id: 'privacy', label: "Privacy Policy", href: "/privacy" },
+  { id: 'terms', label: "Terms of Service", href: "/terms" },
+  { id: 'security', label: "Security", href: "/security" },
 ];
 

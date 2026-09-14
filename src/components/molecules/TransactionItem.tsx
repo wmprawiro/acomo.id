@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from '@/lib/utils';
 import { forwardRef } from 'react';
+import { useMasking } from '@/contexts';
 
 export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -12,6 +15,7 @@ export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElemen
 
 export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
   ({ className, title, categoryName, date, amount, type, icon, ...props }, ref) => {
+    const { isVisible } = useMasking();
     return (
       <div
         ref={ref}
@@ -38,8 +42,14 @@ export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
             type === 'income' ? 'text-emerald-400' : 'text-white'
           )}
         >
-          {type === 'income' ? '+' : '-'}
-          {amount}
+          {isVisible ? (
+            <>
+              {type === 'income' ? '+' : '-'}
+              {amount}
+            </>
+          ) : (
+            'Rp *********'
+          )}
         </div>
       </div>
     );

@@ -11,7 +11,7 @@ export const Hero: React.FC = () => {
         </h1>
         
         <p className="font-medium leading-relaxed md:leading-7 text-base md:text-lg text-center text-white max-w-xl mb-12">
-          Drop your email below to claim your spot in line. We'll give you exclusive early access the second we go live.
+          Track your income and expenses instantly. Take full control of your cash flow with acomo.
         </p>
         
         <div className="w-full flex justify-center z-10">

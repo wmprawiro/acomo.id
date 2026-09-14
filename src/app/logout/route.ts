@@ -10,6 +10,6 @@ export async function GET(request: Request) {
   // Lakukan proses logout (ini otomatis menghapus cookie sesi di browser)
   await supabase.auth.signOut();
   
-  // Arahkan user kembali ke halaman login
-  return NextResponse.redirect(`${origin}/login`);
+  // Arahkan user kembali ke halaman utama (landing page)
+  return NextResponse.redirect(`${origin}/`);
 }
