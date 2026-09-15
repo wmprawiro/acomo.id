@@ -36,9 +36,8 @@ export async function GET(request: Request) {
     return NextResponse.redirect(`${origin}/login?error=Could not authenticate user`);
   } catch (err: any) {
     console.error("Critical error in auth/callback:", err);
-    // Kembalikan text polos agar edge function tidak crash jika NextResponse bermasalah
-    return new Response(`Error in auth callback: ${err?.message || 'Unknown error'}`, { 
-      status: 500,
+    return new Response(`Error in auth callback: ${err?.message || 'Unknown error'} \n\n Stack: ${err?.stack || ''}`, { 
+      status: 200,
       headers: { 'content-type': 'text/plain' }
     });
   }
