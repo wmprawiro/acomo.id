@@ -1,19 +1,3 @@
-// Polyfill WebSocket globally BEFORE @supabase/realtime-js is evaluated.
-if (typeof globalThis.WebSocket === 'undefined') {
-  (globalThis as any).WebSocket = class DummyWebSocket {
-    static CONNECTING = 0;
-    static OPEN = 1;
-    static CLOSING = 2;
-    static CLOSED = 3;
-    constructor() {}
-    addEventListener() {}
-    removeEventListener() {}
-    dispatchEvent() { return false; }
-    close() {}
-    send() {}
-  };
-}
-
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
@@ -21,8 +5,8 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -34,7 +18,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
+            // Called from a Server Component — safe to ignore.
           }
         },
       },
