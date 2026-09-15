@@ -21,14 +21,23 @@ export async function GET(request: Request) {
 
     if (code) {
       const supabase = await createClient();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      
+      // Wrap the supabase call in a timeout to detect network blocking
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Supabase API timeout after 5 seconds - possible network block")), 5000)
+      );
+      
+      const { error } = await Promise.race([
+        supabase.auth.exchangeCodeForSession(code),
+        timeoutPromise
+      ]) as { error: any };
       
       if (!error) {
         // Gunakan origin asli atau fallback absolute URL
         return NextResponse.redirect(`${origin}${next}`);
       } else {
-        console.error("Auth callback error:", error.message);
-        return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error.message)}`);
+        console.error("Auth callback error:", error?.message || error);
+        return NextResponse.redirect(`${origin}/login?error=${encodeURIComponent(error?.message || 'Error occurred')}`);
       }
     }
 
