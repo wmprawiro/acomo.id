@@ -13,9 +13,7 @@ export default function AuthCallback() {
       try {
         const supabase = createClient();
         
-        // Supabase client-side JS automatically handles the PKCE code exchange 
-        // when the script loads on the page with a ?code= in the URL.
-        // We just need to wait for the session to be established.
+        // Wait for the session to be established
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {

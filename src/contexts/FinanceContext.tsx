@@ -4,8 +4,6 @@ import { createContext, useContext, useState, useEffect, ReactNode, useMemo } fr
 import { createClient } from '@/lib/supabase/client';
 import type { Wallet } from '@/types/wallet';
 
-// --- Domain Types ---
-// (We should eventually move these to src/types, but for now they live here for simplicity)
 
 export interface Category {
   id: string;
@@ -114,10 +112,7 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
     fetchData();
   }, [userId]);
 
-  // Compute Total Balance (sum of all wallets)
-  // Wait, if a transaction is added, it should reflect in the wallet balance!
-  // In a real app, transactions modify the wallet balance. 
-  // Let's compute actual wallet balances dynamically:
+  // Compute Total Balance (sum of all wallets dynamically based on transactions)
   const computedWallets = useMemo(() => {
     return wallets.map(wallet => {
       // Calculate net flow for this wallet

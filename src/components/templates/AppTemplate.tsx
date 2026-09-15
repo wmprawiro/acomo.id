@@ -9,15 +9,9 @@ export const AppTemplate = ({ children }: { children: React.ReactNode }) => {
   const [isAddOpen, setIsAddOpen] = useState(false);
 
   return (
-    // Memaksa layar luar untuk benar-benar mentok 100dvh dan menonaktifkan scroll dari browser (overflow-hidden)
     <div className="flex justify-center bg-black h-[100dvh] overflow-hidden">
-      
-      {/* Container bingkai HP: tingginya mengikuti layar (h-full) dan isinya menggunakan flex-col */}
       <div className="w-full max-w-[480px] h-full bg-background relative flex flex-col shadow-2xl border-x border-white/5 overflow-hidden">
-        
         <TopNav />
-        
-        {/* Konten Utama, diberikan padding agar tidak tertutup header dan bottom nav */}
         <main className="flex-1 overflow-y-auto px-5 pt-[88px] pb-[120px] no-scrollbar">
           <div className="space-y-6">
             {children}
