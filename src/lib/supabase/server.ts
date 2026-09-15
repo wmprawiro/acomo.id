@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+class DummyWebSocket {}
+
 export async function createClient() {
   const cookieStore = await cookies();
 
@@ -23,6 +25,9 @@ export async function createClient() {
             // user sessions.
           }
         },
+      },
+      realtime: {
+        transport: DummyWebSocket as any,
       },
     }
   );
