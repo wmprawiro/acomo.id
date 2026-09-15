@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       
       // Wrap the supabase call in a timeout to detect network blocking
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Supabase API timeout after 5 seconds - possible network block")), 5000)
+        setTimeout(() => reject(new Error("Supabase API timeout after 2 seconds - possible network block")), 2000)
       );
       
       const { error } = await Promise.race([
