@@ -7,7 +7,7 @@
  * EdgeOne Pages runs Node.js 20. This polyfill prevents that crash.
  */
 export async function register() {
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
+  if (typeof process !== 'undefined' && process.env && process.env.NEXT_RUNTIME === 'nodejs') {
     if (typeof (globalThis as any).WebSocket === 'undefined') {
       (globalThis as any).WebSocket = class DummyWebSocket {
         static CONNECTING = 0;
