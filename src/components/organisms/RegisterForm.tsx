@@ -1,6 +1,6 @@
 'use client';
 
-import { LoginForm } from './LoginForm';
+import { LoginForm } from '@/components/organisms';
 
 export const RegisterForm = () => {
   return (

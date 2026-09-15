@@ -13,3 +13,4 @@ export { CategoryList } from './CategoryList';
 export { ExpenseChart } from './ExpenseChart'; 
 export { CategoryPieChart } from './CategoryPieChart'; 
 export { WalletCarousel } from './WalletCarousel';
+export { Sidebar } from './Sidebar';

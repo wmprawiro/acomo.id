@@ -5,19 +5,24 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export type CurrencyCode = 'IDR' | 'USD' | 'EUR';
+export type CurrencyCode = string;
 
 export function formatCurrency(amount: number, currency: CurrencyCode, compact: boolean = false) {
-  const locales: Record<CurrencyCode, string> = {
-    IDR: 'id-ID',
-    USD: 'en-US',
-    EUR: 'de-DE'
-  };
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currency,
+      notation: compact ? 'compact' : 'standard',
+      maximumFractionDigits: compact ? 1 : 0,
+    }).format(amount);
+  } catch (e) {
+    // Fallback if currency is invalid
+    return `${currency} ${amount.toLocaleString()}`;
+  }
+}
 
-  return new Intl.NumberFormat(locales[currency], {
-    style: 'currency',
-    currency: currency,
-    notation: compact ? 'compact' : 'standard',
-    maximumFractionDigits: compact ? 1 : 0,
-  }).format(amount);
+export function maskCurrency(currency: CurrencyCode): string {
+  // Format a zero value to get the currency symbol/prefix, then replace digits with *
+  const sample = formatCurrency(0, currency).replace(/0/g, '*');
+  return sample;
 }

@@ -9,30 +9,38 @@ import {
 } from '@phosphor-icons/react';
 import { usePreferences, useFinance } from '@/contexts';
 import { IosSheet, LegalSheet, type LegalSheetType } from '@/components/molecules';
+import { Input } from '@/components/atoms';
 import { CurrencyCode, cn } from '@/lib/utils';
+import { CURRENCIES } from '@/constants/currencies';
 
 export default function ProfilePage() {
   const { currency, setCurrency, firstDayOfMonth, setFirstDayOfMonth, notifications, setNotifications } = usePreferences();
-  const { wallets, categories, transactions } = useFinance();
+  const { wallets, categories, transactions, addWallet, addCategory } = useFinance();
   const [isCurrencySheetOpen, setIsCurrencySheetOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
 
-  const CURRENCIES: { code: CurrencyCode; label: string }[] = [
-    { code: 'IDR', label: 'Indonesian Rupiah' },
-    { code: 'USD', label: 'US Dollar' },
-    { code: 'EUR', label: 'Euro' },
+  const [newWallet, setNewWallet] = useState({ name: '', type: 'bank' as const, balance: '', color: 'from-blue-500 to-blue-700' });
+  const [newCategory, setNewCategory] = useState<{ name: string; type: 'expense' | 'income'; color: string; icon: string }>({ name: '', type: 'expense', color: 'bg-orange-500', icon: 'tag' });
+
+  const CATEGORY_COLORS = [
+    'bg-rose-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500',
+    'bg-lime-500', 'bg-emerald-500', 'bg-teal-500', 'bg-cyan-500',
+    'bg-sky-500', 'bg-blue-500', 'bg-indigo-500', 'bg-violet-500',
+    'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-zinc-500'
   ];
 
+  const { userProfile } = usePreferences();
+
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       {/* Profile Header */}
       <div className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl rounded-[24px] p-5 border border-white/10 shadow-2xl flex items-center gap-4">
         <div className="relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/10 text-white border border-white/20 w-[72px] h-[72px] text-2xl shrink-0 shadow-xl">
-          <span className="font-medium text-white/80">WM</span>
+          <span className="font-medium text-white/80">{userProfile.name.charAt(0).toUpperCase()}</span>
         </div>
         <div className="flex flex-col justify-center">
-          <h2 className="text-[22px] font-bold text-white tracking-tight leading-tight">Wahyu Maulana</h2>
-          <p className="text-[15px] text-white/50 mt-1">wahyump62@gmail.com</p>
+          <h2 className="text-[22px] font-bold text-white tracking-tight leading-tight">{userProfile.name}</h2>
+          <p className="text-[15px] text-white/50 mt-1">{userProfile.email}</p>
         </div>
       </div>
 
@@ -202,24 +210,23 @@ export default function ProfilePage() {
 
       {/* App Version Info Footer */}
       <div className="flex flex-col items-center justify-center pt-4 pb-12 opacity-40">
-        <p className="text-[13px] font-medium tracking-wide">Acomo v1.0.0</p>
-        <p className="text-[12px]">by wmprawiro.dev</p>
+        <p className="text-[13px] font-medium tracking-wide">acomo v1.0.0</p>
       </div>
 
       {/* Currency Sheet */}
       <IosSheet isOpen={isCurrencySheetOpen} onClose={() => setIsCurrencySheetOpen(false)} title="Select Currency">
-        <div className="flex flex-col">
-          {CURRENCIES.map((c) => (
+        <div className="flex flex-col bg-[#1C1C1E] border border-white/5 rounded-[24px] overflow-hidden">
+          {CURRENCIES.map((c, i, arr) => (
             <div 
               key={c.code}
               onClick={() => {
                 setCurrency(c.code);
                 setIsCurrencySheetOpen(false);
               }}
-              className="flex items-center justify-between px-5 py-4 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors cursor-pointer"
+              className={cn("flex items-center justify-between p-5 hover:bg-white/5 transition-colors cursor-pointer", i !== arr.length - 1 && "border-b border-white/5")}
             >
               <div className="flex flex-col">
-                <span className={cn("text-[17px] font-medium tracking-tight", currency === c.code ? "text-emerald-400" : "text-white")}>
+                <span className={cn("text-[17px] tracking-tight", currency === c.code ? "text-emerald-400 font-semibold" : "text-white")}>
                   {c.code}
                 </span>
                 <span className="text-[13px] text-white/50 mt-0.5">{c.label}</span>
@@ -242,7 +249,7 @@ export default function ProfilePage() {
       {/* Wallet Manager Sheet */}
       <IosSheet isOpen={activeSheet === 'Wallets'} onClose={() => setActiveSheet(null)} title="Manage Wallets">
         <div className="flex flex-col space-y-3">
-          {useFinance().wallets.map(w => (
+          {wallets.map(w => (
             <div key={w.id} className="flex items-center justify-between p-4 bg-[#1C1C1E] border border-white/5 rounded-[16px]">
               <div className="flex items-center gap-3">
                 <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br", w.color || 'from-zinc-500 to-zinc-700')}>
@@ -256,8 +263,8 @@ export default function ProfilePage() {
               <p className="text-white font-bold">{currency} {w.balance.toLocaleString('id-ID')}</p>
             </div>
           ))}
-          <button onClick={() => { setActiveSheet(null); /* in a real app, open add wallet modal here */ }} className="mt-4 w-full py-4 bg-white/10 text-white rounded-[16px] font-semibold hover:bg-white/20 transition-colors">
-            Close
+          <button onClick={() => setActiveSheet('Add Wallet')} className="mt-4 w-full py-4 bg-emerald-500/20 text-emerald-500 rounded-[16px] font-semibold hover:bg-emerald-500/30 transition-colors">
+            + Add New Wallet
           </button>
         </div>
       </IosSheet>
@@ -265,7 +272,7 @@ export default function ProfilePage() {
       {/* Category Manager Sheet */}
       <IosSheet isOpen={activeSheet === 'Categories'} onClose={() => setActiveSheet(null)} title="Manage Categories">
         <div className="flex flex-col space-y-3">
-          {useFinance().categories.map(c => (
+          {categories.map(c => (
             <div key={c.id} className="flex items-center justify-between p-4 bg-[#1C1C1E] border border-white/5 rounded-[16px]">
               <div className="flex items-center gap-3">
                 <div className={cn("w-3 h-3 rounded-full", c.color)} />
@@ -276,8 +283,8 @@ export default function ProfilePage() {
               </div>
             </div>
           ))}
-          <button onClick={() => setActiveSheet(null)} className="mt-4 w-full py-4 bg-white/10 text-white rounded-[16px] font-semibold hover:bg-white/20 transition-colors">
-            Close
+          <button onClick={() => setActiveSheet('Add Category')} className="mt-4 w-full py-4 bg-sky-500/20 text-sky-500 rounded-[16px] font-semibold hover:bg-sky-500/30 transition-colors">
+            + Add New Category
           </button>
         </div>
       </IosSheet>
@@ -289,7 +296,7 @@ export default function ProfilePage() {
             Select the day your monthly budget cycle starts. Usually the day you receive your salary.
           </p>
           <div className="grid grid-cols-7 gap-2">
-            {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
               <button
                 key={day}
                 onClick={() => {
@@ -321,7 +328,7 @@ export default function ProfilePage() {
             <div key={key} className={cn("flex items-center justify-between p-5", i !== arr.length - 1 && "border-b border-white/5")}>
               <span className="text-white text-[17px] tracking-tight">{label}</span>
               <button 
-                onClick={() => setNotifications(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }))}
+                onClick={() => setNotifications({ ...notifications, [key]: !notifications[key as keyof typeof notifications] })}
                 className={cn(
                   "w-12 h-7 rounded-full relative transition-colors duration-300",
                   notifications[key as keyof typeof notifications] ? "bg-emerald-500" : "bg-white/10"
@@ -413,8 +420,103 @@ export default function ProfilePage() {
         </div>
       </IosSheet>
 
+      {/* Add Wallet Sheet */}
+      <IosSheet isOpen={activeSheet === 'Add Wallet'} onClose={() => setActiveSheet('Wallets')} title="New Wallet">
+        <div className="flex flex-col space-y-4">
+          <Input 
+            placeholder="Wallet Name (e.g. BCA, Gopay)" 
+            value={newWallet.name}
+            onChange={e => setNewWallet({ ...newWallet, name: e.target.value })}
+          />
+
+          <Input 
+            type="number"
+            placeholder="Initial Balance" 
+            value={newWallet.balance}
+            onChange={e => setNewWallet({ ...newWallet, balance: e.target.value })}
+          />
+          <button 
+            onClick={() => {
+              if (newWallet.name) {
+                addWallet({
+                  name: newWallet.name,
+                  type: newWallet.type,
+                  balance: Number(newWallet.balance) || 0,
+                  color: newWallet.color
+                });
+                setNewWallet({ name: '', type: 'bank', balance: '', color: 'from-blue-500 to-blue-700' });
+                setActiveSheet('Wallets');
+              }
+            }}
+            className="w-full py-4 mt-2 bg-emerald-500 text-white rounded-[16px] font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            Save Wallet
+          </button>
+        </div>
+      </IosSheet>
+
+      {/* Add Category Sheet */}
+      <IosSheet isOpen={activeSheet === 'Add Category'} onClose={() => setActiveSheet('Categories')} title="New Category">
+        <div className="flex flex-col space-y-4">
+          <Input 
+            placeholder="Category Name" 
+            value={newCategory.name}
+            onChange={e => setNewCategory({ ...newCategory, name: e.target.value })}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            {(['expense', 'income'] as const).map(type => (
+              <button
+                key={type}
+                onClick={() => setNewCategory({ ...newCategory, type })}
+                className={cn(
+                  "py-3 rounded-[12px] text-[14px] font-medium capitalize transition-colors border",
+                  newCategory.type === type 
+                    ? "bg-sky-500/20 border-sky-500 text-sky-500" 
+                    : "bg-white/5 border-white/10 text-white/50"
+                )}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-3 pt-2">
+            <label className="text-[13px] text-white/50 px-1">Category Color</label>
+            <div className="grid grid-cols-8 gap-y-3 gap-x-2">
+              {CATEGORY_COLORS.map(c => (
+                <button
+                  key={c}
+                  onClick={() => setNewCategory({ ...newCategory, color: c })}
+                  className={cn(
+                    "w-full aspect-square rounded-full transition-transform mx-auto max-w-[28px]", 
+                    c, 
+                    newCategory.color === c ? "ring-2 ring-white ring-offset-2 ring-offset-[#1C1C1E] scale-110" : "opacity-70 hover:opacity-100 hover:scale-105"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+          <button 
+            onClick={() => {
+              if (newCategory.name) {
+                addCategory({
+                  name: newCategory.name,
+                  type: newCategory.type,
+                  color: newCategory.color,
+                  icon: 'tag'
+                });
+                setNewCategory({ name: '', type: 'expense', color: 'bg-orange-500', icon: 'tag' });
+                setActiveSheet('Categories');
+              }
+            }}
+            className="w-full py-4 mt-2 bg-sky-500 text-white rounded-[16px] font-semibold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/20"
+          >
+            Save Category
+          </button>
+        </div>
+      </IosSheet>
+
       {/* Generic Placeholder Sheet (Should technically never appear now) */}
-      <IosSheet isOpen={!!activeSheet && !['Terms of Service', 'Privacy Policy', 'Help & Support', "What's New", 'Wallets', 'Categories', 'First Day of Month', 'Notifications', 'Export Data', 'Import Data', 'Backup & Restore'].includes(activeSheet)} onClose={() => setActiveSheet(null)} title={activeSheet || ''}>
+      <IosSheet isOpen={!!activeSheet && !['Terms of Service', 'Privacy Policy', 'Help & Support', "What's New", 'Wallets', 'Add Wallet', 'Categories', 'Add Category', 'First Day of Month', 'Notifications', 'Export Data', 'Import Data', 'Backup & Restore'].includes(activeSheet)} onClose={() => setActiveSheet(null)} title={activeSheet || ''}>
         <div className="flex flex-col items-center justify-center py-10 opacity-70">
           <Sparkle size={48} weight="duotone" className="mb-4 text-emerald-400" />
           <p className="text-[17px] text-white font-medium tracking-tight text-center">Coming Soon</p>

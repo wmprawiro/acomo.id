@@ -1,6 +1,6 @@
 "use client";
 
-import { IosSheet } from './IosSheet';
+import { IosSheet } from '@/components/molecules';
 import { Sparkle, Circle, EnvelopeSimple } from '@phosphor-icons/react';
 
 export type LegalSheetType = 'Terms of Service' | 'Privacy Policy' | 'Help & Support' | 'What\'s New';
@@ -121,7 +121,7 @@ export const LegalSheet = ({ isOpen, onClose, type }: LegalSheetProps) => {
   }
 
   return (
-    <IosSheet isOpen={isOpen} onClose={onClose} title={type}>
+    <IosSheet isOpen={isOpen} onClose={onClose} title={type ?? ''}>
       <div className="h-full overflow-y-auto">
         {content}
       </div>

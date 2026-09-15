@@ -1,19 +1,18 @@
 'use client';
 
-import { usePreferences } from '@/contexts';
 import { formatCurrency, cn } from '@/lib/utils';
-import { WarningCircle, CheckCircle } from '@phosphor-icons/react';
+import type { CurrencyCode } from '@/lib/utils';
+import { WarningCircle } from '@phosphor-icons/react';
 
-interface BudgetProgressProps {
+export interface BudgetProgressProps {
   title: string;
   spent: number;
   total: number;
+  currency: CurrencyCode;
   icon?: React.ReactNode;
 }
 
-export const BudgetProgress = ({ title, spent, total, icon }: BudgetProgressProps) => {
-  const { currency } = usePreferences();
-  
+export const BudgetProgress = ({ title, spent, total, currency, icon }: BudgetProgressProps) => {
   const percentage = total > 0 ? Math.min((spent / total) * 100, 100) : 0;
   const isWarning = percentage >= 85;
   const isDanger = percentage >= 100;

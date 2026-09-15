@@ -13,7 +13,7 @@ export const AppTemplate = ({ children }: { children: React.ReactNode }) => {
     <div className="flex justify-center bg-black h-[100dvh] overflow-hidden">
       
       {/* Container bingkai HP: tingginya mengikuti layar (h-full) dan isinya menggunakan flex-col */}
-      <div className="w-full max-w-[480px] h-full bg-[#111218] relative flex flex-col shadow-2xl border-x border-white/5 overflow-hidden">
+      <div className="w-full max-w-[480px] h-full bg-background relative flex flex-col shadow-2xl border-x border-white/5 overflow-hidden">
         
         <TopNav />
         

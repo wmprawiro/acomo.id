@@ -63,6 +63,7 @@ export const AddTransactionForm = ({ onSuccess }: AddTransactionFormProps) => {
         type,
         walletId,
         categoryId,
+        date: new Date(date).toISOString(),
       });
       
       // Reset form

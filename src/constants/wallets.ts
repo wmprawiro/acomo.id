@@ -1,4 +1,4 @@
-import { Wallet } from '@/types/wallet';
+import type { Wallet } from '@/types/wallet';
 
 export const MOCK_WALLETS: Wallet[] = [
   { id: 'w1', name: 'BCA Utama', type: 'bank', balance: 12500000, color: 'from-blue-600/80 to-blue-900/80' },

@@ -1,5 +1,5 @@
 import { AppTemplate } from '@/components/templates';
-import { PreferencesProvider, FinanceProvider } from '@/contexts';
+import { PreferencesProvider, FinanceProvider, MaskingProvider } from '@/contexts';
 
 export default function AppLayout({
   children,
@@ -9,7 +9,9 @@ export default function AppLayout({
   return (
     <PreferencesProvider>
       <FinanceProvider>
-        <AppTemplate>{children}</AppTemplate>
+        <MaskingProvider>
+          <AppTemplate>{children}</AppTemplate>
+        </MaskingProvider>
       </FinanceProvider>
     </PreferencesProvider>
   );

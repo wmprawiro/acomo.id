@@ -1,33 +1,50 @@
+'use client';
+
+import { useState } from 'react';
 import { ExpenseChart, CategoryPieChart } from '@/components/organisms';
+import { cn } from '@/lib/utils';
 
 export default function ReportsPage() {
+  const [activeTab, setActiveTab] = useState<'Week' | 'Month' | 'Year'>('Week');
+
+  const tabs = [
+    { label: 'Weekly', value: 'Week' },
+    { label: 'Monthly', value: 'Month' },
+    { label: 'Yearly', value: 'Year' },
+  ] as const;
+
   return (
     <div className="space-y-6">
       {/* iOS Segmented Control Mock */}
       <div className="bg-[#1C1C1E] p-1 rounded-lg flex w-full max-w-xs mx-auto border border-white/5">
-        <button className="flex-1 py-1.5 bg-[#2C2C2E] rounded-md text-sm font-semibold text-white shadow-sm">
-          Weekly
-        </button>
-        <button className="flex-1 py-1.5 text-sm font-medium text-white/50 hover:text-white transition-colors">
-          Monthly
-        </button>
-        <button className="flex-1 py-1.5 text-sm font-medium text-white/50 hover:text-white transition-colors">
-          Yearly
-        </button>
+        {tabs.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={cn(
+              "flex-1 py-1.5 rounded-md text-sm transition-colors",
+              activeTab === tab.value
+                ? "bg-[#2C2C2E] font-semibold text-white shadow-sm"
+                : "font-medium text-white/50 hover:text-white"
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <section>
-        <div className="flex items-center justify-between mb-2 px-1">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">Trends</h2>
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">Trends</h3>
         </div>
-        <ExpenseChart />
+        <ExpenseChart period={activeTab} />
       </section>
 
       <section>
-        <div className="flex items-center justify-between mb-2 px-1 mt-8">
-          <h2 className="text-xl font-bold text-foreground tracking-tight">Categories</h2>
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">Categories</h3>
         </div>
-        <CategoryPieChart />
+        <CategoryPieChart period={activeTab} />
       </section>
     </div>
   );

@@ -3,13 +3,16 @@
 import { useState, useMemo } from 'react';
 import { ExpenseChart, CategoryPieChart } from '@/components/organisms';
 import { TransactionItem, IosSheet } from '@/components/molecules';
-import { MaskingProvider, useFinance } from '@/contexts';
+import { useFinance, useMasking, usePreferences } from '@/contexts';
+import { cn } from '@/lib/utils';
 import { Funnel, Calendar } from '@phosphor-icons/react';
 
 export default function ExpensesPage() {
   const [activeTab, setActiveTab] = useState<'Day' | 'Week' | 'Month' | 'Year'>('Week');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { transactions, categories } = useFinance();
+  const { isVisible } = useMasking();
+  const { currency } = usePreferences();
 
   const TOP_SPENDING = useMemo(() => {
     return transactions
@@ -35,7 +38,9 @@ export default function ExpensesPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-white/80">
             <Calendar size={20} weight="duotone" />
-            <span className="font-medium">September 2026</span>
+            <span className="font-medium">
+              {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </span>
           </div>
           <button onClick={() => setIsFilterOpen(true)} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/10 transition-colors">
             <Funnel size={18} weight="fill" />
@@ -48,11 +53,12 @@ export default function ExpensesPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 text-center py-2 text-[14px] font-medium transition-colors ${
+              className={cn(
+                "flex-1 text-center py-2 text-[14px] font-medium transition-colors",
                 activeTab === tab
-                  ? 'text-white bg-white/10 rounded-xl shadow-sm'
-                  : 'text-white/50 hover:text-white'
-              }`}
+                  ? "text-white bg-white/10 rounded-xl shadow-sm"
+                  : "text-white/50 hover:text-white"
+              )}
             >
               {tab}
             </button>
@@ -61,12 +67,12 @@ export default function ExpensesPage() {
 
         {/* Main Chart */}
         <section>
-          <ExpenseChart />
+          <ExpenseChart period={activeTab} />
         </section>
 
         {/* Categories */}
         <section>
-          <CategoryPieChart />
+          <CategoryPieChart period={activeTab} />
         </section>
 
         {/* Top Spending List */}
@@ -86,6 +92,8 @@ export default function ExpensesPage() {
                   date={trx.formattedDate}
                   amount={trx.amount}
                   type={trx.type}
+                  currency={currency}
+                  isVisible={isVisible}
                 />
               ))
             )}
@@ -96,8 +104,8 @@ export default function ExpensesPage() {
 
       <IosSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} title="Filter Transactions">
         <div className="space-y-6">
-          <div className="bg-[#1C1C1E] border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+          <div className="bg-[#1C1C1E] border border-white/5 rounded-[24px] overflow-hidden">
+            <div className="flex flex-col gap-2 p-5">
               <label className="text-[13px] text-white/50">Sort By</label>
               <select className="bg-transparent text-white text-[17px] outline-none">
                 <option value="highest">Highest Amount</option>
@@ -106,19 +114,19 @@ export default function ExpensesPage() {
               </select>
             </div>
             <div className="h-[1px] w-full bg-white/5" />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 p-5">
               <label className="text-[13px] text-white/50">Category</label>
               <select className="bg-transparent text-white text-[17px] outline-none">
                 <option value="all">All Categories</option>
-                <option value="food">Food & Dining</option>
-                <option value="transport">Transportation</option>
-                <option value="electronics">Electronics</option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
               </select>
             </div>
           </div>
           <button 
             onClick={() => setIsFilterOpen(false)}
-            className="w-full bg-white text-black font-semibold rounded-2xl py-4 hover:bg-gray-200 transition-colors"
+            className="w-full py-4 bg-emerald-500 text-white font-semibold rounded-[16px] hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
           >
             Apply Filters
           </button>

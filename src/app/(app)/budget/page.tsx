@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { usePreferences, useMasking, useFinance } from '@/contexts';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, maskCurrency, cn } from '@/lib/utils';
 import { BudgetProgress, IosSheet } from '@/components/molecules';
 import { ForkKnife, CarProfile, ShoppingBag, Plus, Tag, Money } from '@phosphor-icons/react';
 
@@ -46,8 +46,6 @@ export default function BudgetPage() {
   const totalBudget = budgets.reduce((acc, curr) => acc + curr.total, 0);
   const totalSpent = budgets.reduce((acc, curr) => acc + curr.spent, 0);
 
-  const hiddenText = currency === 'IDR' ? 'Rp *********' : (currency === 'USD' ? '$ ***' : '€ ***');
-  
   const percentage = Math.min((totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0), 100) || 0;
   const isWarning = percentage >= 85;
 
@@ -69,7 +67,7 @@ export default function BudgetPage() {
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6">
       
       {/* Total Budget Card */}
       <section className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl p-6 rounded-[24px] border border-white/10 shadow-2xl relative overflow-hidden">
@@ -77,7 +75,7 @@ export default function BudgetPage() {
           <div>
             <h3 className="text-white/60 text-sm font-medium mb-1">Total Monthly Budget</h3>
             <p className="text-2xl font-bold text-white tracking-tight">
-              {isVisible ? formatCurrency(totalBudget, currency) : hiddenText}
+              {isVisible ? formatCurrency(totalBudget, currency) : maskCurrency(currency)}
             </p>
           </div>
           <button onClick={() => setIsAddOpen(true)} className="bg-white/10 text-white p-2.5 rounded-full hover:bg-white/20 transition-colors backdrop-blur-md">
@@ -87,12 +85,15 @@ export default function BudgetPage() {
 
         <div className="relative z-10">
           <div className="flex justify-between text-[13px] text-white/70 mb-2">
-            <span>Spent: {isVisible ? formatCurrency(totalSpent, currency) : hiddenText}</span>
+            <span>Spent: {isVisible ? formatCurrency(totalSpent, currency) : maskCurrency(currency)}</span>
             <span className={isWarning ? "text-amber-400" : "text-emerald-400"}>{percentage.toFixed(0)}%</span>
           </div>
           <div className="h-3 w-full bg-black/40 rounded-full overflow-hidden shadow-inner">
             <div 
-              className={`h-full rounded-full transition-all duration-1000 ease-out ${percentage >= 100 ? 'bg-rose-500' : percentage >= 85 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+              className={cn(
+                "h-full rounded-full transition-all duration-1000 ease-out",
+                percentage >= 100 ? 'bg-rose-500' : percentage >= 85 ? 'bg-amber-500' : 'bg-emerald-500'
+              )}
               style={{ width: `${percentage}%` }}
             />
           </div>
@@ -105,10 +106,10 @@ export default function BudgetPage() {
       {/* Category Budgets */}
       <section>
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-[16px] font-semibold text-white/90 tracking-tight">Budgets by Category</h3>
+          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">Budgets by Category</h3>
         </div>
         
-        <div className="bg-gradient-to-br from-[#1C1C1E]/40 to-[#2C2C2E]/40 backdrop-blur-xl p-2 rounded-[24px] border border-white/5">
+        <div className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl p-2 rounded-[24px] border border-white/10">
           {budgets.length === 0 ? (
             <div className="py-8 px-4 text-center text-white/40 text-sm">
               No budgets created yet. Tap the <span className="text-white/60 font-medium">+</span> button to create one.
@@ -120,6 +121,7 @@ export default function BudgetPage() {
                 title={budget.title}
                 spent={budget.spent}
                 total={budget.total}
+                currency={currency}
                 icon={budget.icon}
               />
             ))
@@ -129,8 +131,8 @@ export default function BudgetPage() {
 
       <IosSheet isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="New Budget">
         <form onSubmit={handleAddBudget} className="space-y-6">
-          <div className="bg-[#1C1C1E] border border-white/10 rounded-2xl p-4 flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
+          <div className="bg-[#1C1C1E] border border-white/5 rounded-[24px] overflow-hidden">
+            <div className="flex flex-col gap-2 p-5">
               <label className="text-[13px] text-white/50">Category Name</label>
               <input 
                 type="text" 
@@ -143,7 +145,7 @@ export default function BudgetPage() {
               />
             </div>
             <div className="h-[1px] w-full bg-white/5" />
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 p-5">
               <label className="text-[13px] text-white/50">Limit Amount</label>
               <input 
                 type="number" 
@@ -155,7 +157,7 @@ export default function BudgetPage() {
               />
             </div>
           </div>
-          <button type="submit" className="w-full bg-white text-black font-semibold rounded-2xl py-4 hover:bg-gray-200 transition-colors">
+          <button type="submit" className="w-full py-4 bg-emerald-500 text-white font-semibold rounded-[16px] hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20">
             Create Budget
           </button>
         </form>

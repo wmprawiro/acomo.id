@@ -1,8 +1,8 @@
 "use client";
 
-import { cn, formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency, maskCurrency } from '@/lib/utils';
+import type { CurrencyCode } from '@/lib/utils';
 import { forwardRef } from 'react';
-import { useMasking, usePreferences } from '@/contexts';
 import { ArrowUp, ArrowDown } from '@phosphor-icons/react';
 
 export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -11,15 +11,13 @@ export interface TransactionItemProps extends React.HTMLAttributes<HTMLDivElemen
   date: string;
   amount: number;
   type: 'income' | 'expense';
+  currency: CurrencyCode;
+  isVisible: boolean;
   icon?: React.ReactNode;
 }
 
 export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
-  ({ className, title, categoryName, date, amount, type, icon, ...props }, ref) => {
-    const { isVisible } = useMasking();
-    const { currency } = usePreferences();
-    
-    const hiddenText = currency === 'IDR' ? 'Rp *********' : (currency === 'USD' ? '$ ***' : '€ ***');
+  ({ className, title, categoryName, date, amount, type, currency, isVisible, icon, ...props }, ref) => {
     const formattedAmount = formatCurrency(amount, currency);
 
     return (
@@ -47,7 +45,7 @@ export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
           <div className="min-w-0 flex-1">
             <p className="text-[15px] text-white tracking-tight font-medium truncate">{title}</p>
             <p className="text-[12px] text-white/50 mt-0.5 truncate">
-              {categoryName} • {date}
+              {categoryName}{date ? ` • ${date}` : ''}
             </p>
           </div>
         </div>
@@ -63,7 +61,7 @@ export const TransactionItem = forwardRef<HTMLDivElement, TransactionItemProps>(
               {formattedAmount}
             </>
           ) : (
-            hiddenText
+            maskCurrency(currency)
           )}
         </div>
       </div>

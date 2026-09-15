@@ -2,9 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePreferences } from '@/contexts';
 
 export const TopNav = () => {
   const pathname = usePathname();
+  const { userProfile } = usePreferences();
   
   const getTitle = () => {
     if (pathname.startsWith('/dashboard')) return 'Dashboard';
@@ -20,8 +22,8 @@ export const TopNav = () => {
       <h2 className="text-[28px] font-bold text-white tracking-tight">{getTitle()}</h2>
       <div className="flex items-center gap-5">
         {/* Profile Avatar as Link */}
-        <Link href="/profile" className="relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/10 text-white border border-white/20 w-9 h-9 cursor-pointer hover:bg-white/20 transition-colors">
-          <span className="font-medium text-white/80">WM</span>
+        <Link href="/profile" className="relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white/10 text-white border border-white/20 w-10 h-10 cursor-pointer hover:bg-white/20 transition-colors">
+          <span className="font-medium text-white/80">{userProfile.name.charAt(0).toUpperCase()}</span>
         </Link>
       </div>
     </header>

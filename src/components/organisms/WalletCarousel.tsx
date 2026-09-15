@@ -2,80 +2,82 @@
 
 import { useState } from 'react';
 import { useMasking, usePreferences, useFinance } from '@/contexts';
-import { formatCurrency, cn } from '@/lib/utils';
+import { formatCurrency, cn, maskCurrency } from '@/lib/utils';
 import { IosSheet } from '@/components/molecules';
-import { Bank, Wallet as WalletIcon, Money } from '@phosphor-icons/react';
-
-const getIconForType = (type: string) => {
-  switch (type) {
-    case 'bank': return <Bank size={24} weight="duotone" />;
-    case 'e-wallet': return <WalletIcon size={24} weight="duotone" />;
-    case 'cash': return <Money size={24} weight="duotone" />;
-    default: return <WalletIcon size={24} weight="duotone" />;
-  }
-};
+import { Input } from '@/components/atoms';
+import type { Wallet } from '@/types/wallet';
 
 export const WalletCarousel = () => {
   const { isVisible } = useMasking();
   const { currency } = usePreferences();
-  const { wallets, addWallet } = useFinance();
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [newWalletName, setNewWalletName] = useState('');
+  const { wallets, addWallet, updateWallet } = useFinance();
   
-  const hiddenText = currency === 'IDR' ? 'Rp *********' : (currency === 'USD' ? '$ ***' : '€ ***');
+  const [sheetMode, setSheetMode] = useState<'add' | 'edit' | null>(null);
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<{ name: string; type: 'bank' | 'e-wallet' | 'cash'; balance: string; color: string }>({
+    name: '', type: 'e-wallet', balance: '', color: 'from-purple-500/80 to-purple-800/80'
+  });
+  
+  const hiddenText = maskCurrency(currency);
 
-  const handleAddWallet = (e: React.FormEvent) => {
+  const openAddSheet = () => {
+    setFormData({ name: '', type: 'e-wallet', balance: '', color: 'from-purple-500/80 to-purple-800/80' });
+    setSheetMode('add');
+  };
+
+  const openEditSheet = (wallet: Wallet) => {
+    setSelectedWalletId(wallet.id);
+    setFormData({ name: wallet.name, type: wallet.type, balance: wallet.balance.toString(), color: wallet.color });
+    setSheetMode('edit');
+  };
+
+  const handleSaveWallet = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newWalletName.trim()) return;
+    if (!formData.name.trim()) return;
     
-    addWallet({
-      name: newWalletName,
-      type: 'e-wallet',
-      balance: 0,
-      color: 'from-purple-500/80 to-purple-800/80'
-    });
+    if (sheetMode === 'add') {
+      addWallet({
+        name: formData.name,
+        type: formData.type,
+        balance: Number(formData.balance) || 0,
+        color: formData.color
+      });
+    } else if (sheetMode === 'edit' && selectedWalletId) {
+      updateWallet(selectedWalletId, {
+        name: formData.name,
+        type: formData.type,
+        balance: Number(formData.balance) || 0,
+        color: formData.color
+      });
+    }
     
-    setNewWalletName('');
-    setIsAddOpen(false);
+    setSheetMode(null);
   };
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className="flex items-center justify-between mb-4 px-1">
         <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">My Wallets</h3>
       </div>
       
       {/* Horizontal scroll container */}
-      <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar -mx-5 px-5 snap-x snap-mandatory">
+      <div className="flex overflow-x-auto gap-4 pb-1 no-scrollbar -mx-5 px-5 snap-x snap-mandatory">
         {wallets.map((wallet) => (
           <div 
             key={wallet.id}
-            className={cn(
-              "shrink-0 w-[160px] p-4 rounded-[20px] shadow-xl border border-white/10 relative overflow-hidden backdrop-blur-2xl bg-gradient-to-br snap-center",
-              wallet.color
-            )}
+            onClick={() => openEditSheet(wallet)}
+            className="shrink-0 w-[160px] p-4 rounded-[20px] border border-white/10 bg-[#1C1C1E] snap-center cursor-pointer hover:bg-white/5 transition-colors flex flex-col justify-center"
           >
-            <div className="flex flex-col h-full relative z-10">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white mb-6 backdrop-blur-md border border-white/20">
-                {getIconForType(wallet.type)}
-              </div>
-              <div className="mt-auto">
-                <p className="text-white/80 text-[13px] font-medium mb-1 truncate">{wallet.name}</p>
-                <p className="text-white font-bold text-[17px] tracking-tight truncate">
-                  {isVisible ? formatCurrency(wallet.balance, currency) : hiddenText}
-                </p>
-              </div>
-            </div>
-            
-            {/* Decorative circles */}
-            <div className="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-            <div className="absolute -top-6 -left-6 w-16 h-16 rounded-full bg-black/10 blur-xl pointer-events-none" />
+            <p className="text-white/80 text-[13px] font-medium mb-1 truncate">{wallet.name}</p>
+            <p className="text-white font-bold text-[17px] tracking-tight truncate">
+              {isVisible ? formatCurrency(wallet.balance, currency) : hiddenText}
+            </p>
           </div>
         ))}
 
         {/* Add New Wallet Card */}
         <div 
-          onClick={() => setIsAddOpen(true)}
+          onClick={openAddSheet}
           className="shrink-0 w-[160px] p-4 rounded-[20px] border border-dashed border-white/20 bg-white/5 hover:bg-white/10 transition-colors flex flex-col items-center justify-center cursor-pointer snap-center group"
         >
           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:text-white transition-colors mb-2">
@@ -85,25 +87,30 @@ export const WalletCarousel = () => {
         </div>
       </div>
 
-      <IosSheet isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} title="New Wallet">
-        <form onSubmit={handleAddWallet} className="space-y-6">
-          <div className="bg-[#1C1C1E] border border-white/10 rounded-2xl p-4 flex flex-col gap-2">
-            <label className="text-[13px] text-white/50">Wallet Name</label>
-            <input 
-              type="text" 
-              placeholder="e.g. OVO, PayPal"
-              value={newWalletName}
-              onChange={(e) => setNewWalletName(e.target.value)}
-              className="bg-transparent text-white text-[17px] outline-none"
-              autoFocus
-              required
-            />
-          </div>
-          <button type="submit" className="w-full bg-white text-black font-semibold rounded-2xl py-4 hover:bg-gray-200 transition-colors">
-            Create Wallet
+      <IosSheet isOpen={sheetMode !== null} onClose={() => setSheetMode(null)} title={sheetMode === 'add' ? "New Wallet" : "Edit Wallet"}>
+        <form onSubmit={handleSaveWallet} className="flex flex-col space-y-4">
+          <Input 
+            placeholder="Wallet Name (e.g. BCA, Gopay)" 
+            value={formData.name}
+            onChange={e => setFormData({ ...formData, name: e.target.value })}
+            required
+          />
+
+          <Input 
+            type="number"
+            placeholder="Balance (Amount)" 
+            value={formData.balance}
+            onChange={e => setFormData({ ...formData, balance: e.target.value })}
+          />
+          <button 
+            type="submit" 
+            className="w-full py-4 mt-2 bg-emerald-500 text-white rounded-[16px] font-semibold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
+          >
+            {sheetMode === 'add' ? "Save Wallet" : "Update Wallet"}
           </button>
         </form>
       </IosSheet>
     </div>
   );
 };
+
