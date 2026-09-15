@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -12,36 +12,44 @@ export default function AuthCallback() {
     const handleAuth = async () => {
       try {
         const supabase = createClient();
-        
+
         // Wait for the session to be established
         const { data, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           throw error;
         }
 
         if (data.session) {
-          router.replace('/dashboard');
+          router.replace("/dashboard");
         } else {
           // Listen for the auth state change if session isn't ready immediately
-          const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-              router.replace('/dashboard');
+          const {
+            data: { subscription },
+          } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === "SIGNED_IN" && session) {
+              router.replace("/dashboard");
             }
           });
-          
+
           // Cleanup timeout
           setTimeout(() => {
             subscription.unsubscribe();
             if (!data.session) {
-              router.replace('/login?error=Could not complete authentication');
+              router.replace("/login?error=Could not complete authentication");
             }
           }, 5000);
         }
-      } catch (err: any) {
-        console.error('Auth error:', err);
-        setError(err.message || 'Authentication failed');
-        setTimeout(() => router.replace('/login?error=' + encodeURIComponent(err.message || 'Authentication failed')), 3000);
+      } catch (err: unknown) {
+        console.error("Auth error:", err);
+        const errorMessage =
+          err instanceof Error ? err.message : "Authentication failed";
+        setError(errorMessage);
+        setTimeout(
+          () =>
+            router.replace("/login?error=" + encodeURIComponent(errorMessage)),
+          3000,
+        );
       }
     };
 

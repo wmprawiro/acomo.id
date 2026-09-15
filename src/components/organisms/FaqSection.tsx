@@ -1,7 +1,7 @@
-import React from 'react';
-import { FaqItem } from '@/components/molecules';
-import { FAQ_DATA } from '@/constants/content';
-import { Container } from '@/components/atoms';
+import React from "react";
+import { FaqItem } from "@/components/molecules";
+import { FAQ_DATA } from "@/constants/content";
+import { Container } from "@/components/atoms";
 
 export const FaqSection: React.FC = () => {
   return (
@@ -13,9 +13,9 @@ export const FaqSection: React.FC = () => {
 
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-y-4 gap-x-6 items-start">
           {FAQ_DATA.map((faq) => (
-            <FaqItem 
+            <FaqItem
               key={faq.id}
-              title={faq.title} 
+              title={faq.title}
               content={faq.content}
               defaultOpen={faq.defaultOpen}
             />

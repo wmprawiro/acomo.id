@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface FaqItemProps {
   title: string;
@@ -8,12 +8,16 @@ interface FaqItemProps {
   defaultOpen?: boolean;
 }
 
-export const FaqItem: React.FC<FaqItemProps> = ({ title, content, defaultOpen = false }) => {
+export const FaqItem: React.FC<FaqItemProps> = ({
+  title,
+  content,
+  defaultOpen = false,
+}) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
     <div className="bg-card flex flex-col items-start px-6 py-2 rounded-2xl w-full transition-all">
-      <div 
+      <div
         className="flex min-h-[76px] items-center justify-between py-6 w-full cursor-pointer group"
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -23,10 +27,10 @@ export const FaqItem: React.FC<FaqItemProps> = ({ title, content, defaultOpen = 
           </p>
         </div>
         <div className="flex-shrink-0 flex items-center justify-center size-6">
-          <img 
-            alt="icon" 
-            className={`size-6 transition-transform duration-300 ${isOpen ? 'rotate-45' : ''}`} 
-            src="/assets/icon.svg" 
+          <img
+            alt="icon"
+            className={`size-6 transition-transform duration-300 ${isOpen ? "rotate-45" : ""}`}
+            src="/assets/icon.svg"
           />
         </div>
       </div>

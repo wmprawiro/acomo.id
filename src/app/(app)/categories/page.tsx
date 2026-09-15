@@ -1,4 +1,4 @@
-import { CategoryList } from '@/components/organisms';
+import { CategoryList } from "@/components/organisms";
 
 export default function CategoriesPage() {
   return (

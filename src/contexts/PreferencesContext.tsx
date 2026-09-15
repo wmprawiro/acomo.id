@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { CurrencyCode } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -27,10 +33,12 @@ interface PreferencesContextType {
   setUserProfile: (val: UserProfile) => void;
 }
 
-const PreferencesContext = createContext<PreferencesContextType | undefined>(undefined);
+const PreferencesContext = createContext<PreferencesContextType | undefined>(
+  undefined,
+);
 
 export const PreferencesProvider = ({ children }: { children: ReactNode }) => {
-  const [currency, setCurrency] = useState<CurrencyCode>('IDR');
+  const [currency, setCurrency] = useState<CurrencyCode>("IDR");
   const [firstDayOfMonth, setFirstDayOfMonth] = useState<number>(1);
   const [notifications, setNotifications] = useState<NotificationSettings>({
     dailyReminder: true,
@@ -40,32 +48,34 @@ export const PreferencesProvider = ({ children }: { children: ReactNode }) => {
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: "Wahyu Maulana",
     email: "wahyump62@gmail.com",
-    avatar: "WM"
+    avatar: "WM",
   });
 
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (user) {
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
           .single();
 
         if (profile) {
-          setUserProfile(prev => ({
+          setUserProfile((prev) => ({
             ...prev,
             name: profile.name || profile.full_name || prev.name,
             email: profile.email || user.email || prev.email,
-            avatar: profile.avatar || profile.avatar_url || prev.avatar
+            avatar: profile.avatar || profile.avatar_url || prev.avatar,
           }));
         } else if (user.email) {
-          setUserProfile(prev => ({
+          setUserProfile((prev) => ({
             ...prev,
-            email: user.email!
+            email: user.email!,
           }));
         }
       }
@@ -75,12 +85,18 @@ export const PreferencesProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <PreferencesContext.Provider value={{ 
-      currency, setCurrency, 
-      firstDayOfMonth, setFirstDayOfMonth,
-      notifications, setNotifications,
-      userProfile, setUserProfile
-    }}>
+    <PreferencesContext.Provider
+      value={{
+        currency,
+        setCurrency,
+        firstDayOfMonth,
+        setFirstDayOfMonth,
+        notifications,
+        setNotifications,
+        userProfile,
+        setUserProfile,
+      }}
+    >
       {children}
     </PreferencesContext.Provider>
   );
@@ -89,7 +105,7 @@ export const PreferencesProvider = ({ children }: { children: ReactNode }) => {
 export const usePreferences = () => {
   const context = useContext(PreferencesContext);
   if (context === undefined) {
-    throw new Error('usePreferences must be used within a PreferencesProvider');
+    throw new Error("usePreferences must be used within a PreferencesProvider");
   }
   return context;
 };

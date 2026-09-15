@@ -7,31 +7,43 @@
  * EdgeOne Pages runs Node.js 20. This polyfill prevents that crash.
  */
 export async function register() {
-  if (typeof process !== 'undefined' && process.env && process.env.NEXT_RUNTIME === 'nodejs') {
-    if (typeof (globalThis as any).WebSocket === 'undefined') {
+  if (
+    typeof process !== "undefined" &&
+    process.env &&
+    process.env.NEXT_RUNTIME === "nodejs"
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (typeof (globalThis as any).WebSocket === "undefined") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (globalThis as any).WebSocket = class DummyWebSocket {
         static CONNECTING = 0;
         static OPEN = 1;
         static CLOSING = 2;
         static CLOSED = 3;
         readyState = 0;
-        url = '';
-        protocol = '';
-        extensions = '';
+        url = "";
+        protocol = "";
+        extensions = "";
         bufferedAmount = 0;
-        binaryType = 'blob';
+        binaryType = "blob";
+        /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
         onopen: any = null;
         onclose: any = null;
         onerror: any = null;
         onmessage: any = null;
         constructor(_url?: string, _protocols?: string | string[]) {}
+        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
         addEventListener() {}
         removeEventListener() {}
-        dispatchEvent() { return false; }
+        dispatchEvent() {
+          return false;
+        }
         close() {}
         send() {}
       };
-      console.log('[instrumentation] WebSocket polyfill injected for Node.js 20 compatibility.');
+      console.log(
+        "[instrumentation] WebSocket polyfill injected for Node.js 20 compatibility.",
+      );
     }
   }
 }

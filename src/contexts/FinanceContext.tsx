@@ -1,14 +1,20 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import type { Wallet } from '@/types/wallet';
-
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+  useMemo,
+} from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { Wallet } from "@/types/wallet";
 
 export interface Category {
   id: string;
   name: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   limit?: number;
   color: string;
   icon: string;
@@ -18,7 +24,7 @@ export interface Transaction {
   id: string;
   title: string;
   amount: number;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   categoryId: string;
   walletId: string;
   date: string;
@@ -31,20 +37,24 @@ interface FinanceContextValue {
   wallets: Wallet[];
   categories: Category[];
   transactions: Transaction[];
-  
+
   // Computed
   totalBalance: number;
   totalIncome: number;
   totalExpense: number;
 
   // Actions
-  addWallet: (wallet: Omit<Wallet, 'id'>) => void;
+  addWallet: (wallet: Omit<Wallet, "id">) => void;
   updateWallet: (id: string, updates: Partial<Wallet>) => void;
-  addCategory: (category: Omit<Category, 'id'>) => void;
-  addTransaction: (transaction: Omit<Transaction, 'id'> & { date?: string }) => void;
+  addCategory: (category: Omit<Category, "id">) => void;
+  addTransaction: (
+    transaction: Omit<Transaction, "id"> & { date?: string },
+  ) => void;
 }
 
-const FinanceContext = createContext<FinanceContextValue | undefined>(undefined);
+const FinanceContext = createContext<FinanceContextValue | undefined>(
+  undefined,
+);
 
 export const FinanceProvider = ({ children }: { children: ReactNode }) => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
@@ -55,7 +65,9 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchUser = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
       }
@@ -69,43 +81,56 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async () => {
       const supabase = createClient();
       const [walletsRes, categoriesRes, transactionsRes] = await Promise.all([
-        supabase.from('wallets').select('*').eq('user_id', userId),
-        supabase.from('categories').select('*').eq('user_id', userId),
-        supabase.from('transactions').select('*').eq('user_id', userId).order('date', { ascending: false })
+        supabase.from("wallets").select("*").eq("user_id", userId),
+        supabase.from("categories").select("*").eq("user_id", userId),
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", userId)
+          .order("date", { ascending: false }),
       ]);
 
       if (walletsRes.data) {
-        setWallets(walletsRes.data.map((w: any) => ({
-          id: w.id,
-          name: w.name,
-          type: w.type,
-          balance: w.balance,
-          color: w.color
-        })));
+        setWallets(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          walletsRes.data.map((w: any) => ({
+            id: w.id,
+            name: w.name,
+            type: w.type,
+            balance: w.balance,
+            color: w.color,
+          })),
+        );
       }
-      
+
       if (categoriesRes.data) {
-        setCategories(categoriesRes.data.map((c: any) => ({
-          id: c.id,
-          name: c.name,
-          type: c.type,
-          limit: c.limit_amount,
-          color: c.color,
-          icon: c.icon
-        })));
+        setCategories(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          categoriesRes.data.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            type: c.type,
+            limit: c.limit_amount,
+            color: c.color,
+            icon: c.icon,
+          })),
+        );
       }
 
       if (transactionsRes.data) {
-        setTransactions(transactionsRes.data.map((t: any) => ({
-          id: t.id,
-          title: t.title,
-          amount: t.amount,
-          type: t.type,
-          categoryId: t.category_id,
-          walletId: t.wallet_id,
-          date: t.date,
-          notes: t.notes
-        })));
+        setTransactions(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          transactionsRes.data.map((t: any) => ({
+            id: t.id,
+            title: t.title,
+            amount: t.amount,
+            type: t.type,
+            categoryId: t.category_id,
+            walletId: t.wallet_id,
+            date: t.date,
+            notes: t.notes,
+          })),
+        );
       }
     };
 
@@ -114,16 +139,16 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
 
   // Compute Total Balance (sum of all wallets dynamically based on transactions)
   const computedWallets = useMemo(() => {
-    return wallets.map(wallet => {
+    return wallets.map((wallet) => {
       // Calculate net flow for this wallet
-      const walletTxs = transactions.filter(t => t.walletId === wallet.id);
+      const walletTxs = transactions.filter((t) => t.walletId === wallet.id);
       const net = walletTxs.reduce((acc, tx) => {
-        return tx.type === 'income' ? acc + tx.amount : acc - tx.amount;
+        return tx.type === "income" ? acc + tx.amount : acc - tx.amount;
       }, 0);
-      
+
       return {
         ...wallet,
-        balance: wallet.balance + net // Assuming initial balance is starting balance
+        balance: wallet.balance + net, // Assuming initial balance is starting balance
       };
     });
   }, [wallets, transactions]);
@@ -133,45 +158,56 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
   }, [computedWallets]);
 
   const totalIncome = useMemo(() => {
-    return transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+    return transactions
+      .filter((t) => t.type === "income")
+      .reduce((acc, t) => acc + t.amount, 0);
   }, [transactions]);
 
   const totalExpense = useMemo(() => {
-    return transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+    return transactions
+      .filter((t) => t.type === "expense")
+      .reduce((acc, t) => acc + t.amount, 0);
   }, [transactions]);
 
   // Actions
-  const addWallet = async (wallet: Omit<Wallet, 'id'>) => {
+  const addWallet = async (wallet: Omit<Wallet, "id">) => {
     if (!userId) return;
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .insert({ ...wallet, user_id: userId })
       .select()
       .single();
 
     if (data && !error) {
-      setWallets(prev => [...prev, {
-        id: data.id,
-        name: data.name,
-        type: data.type,
-        balance: data.balance,
-        color: data.color
-      }]);
+      setWallets((prev) => [
+        ...prev,
+        {
+          id: data.id,
+          name: data.name,
+          type: data.type,
+          balance: data.balance,
+          color: data.color,
+        },
+      ]);
     }
   };
 
   const updateWallet = async (id: string, updates: Partial<Wallet>) => {
     if (!userId) return;
     const supabase = createClient();
-    
+
     let newInitialBalance: number | undefined = undefined;
 
     if (updates.balance !== undefined) {
-      const wallet = wallets.find(w => w.id === id);
+      const wallet = wallets.find((w) => w.id === id);
       if (wallet) {
-        const walletTxs = transactions.filter(t => t.walletId === id);
-        const net = walletTxs.reduce((acc, tx) => tx.type === 'income' ? acc + tx.amount : acc - tx.amount, 0);
+        const walletTxs = transactions.filter((t) => t.walletId === id);
+        const net = walletTxs.reduce(
+          (acc, tx) =>
+            tx.type === "income" ? acc + tx.amount : acc - tx.amount,
+          0,
+        );
         newInitialBalance = updates.balance - net;
       }
     }
@@ -182,22 +218,29 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const { error } = await supabase
-      .from('wallets')
+      .from("wallets")
       .update(dbUpdates)
-      .eq('id', id)
-      .eq('user_id', userId);
+      .eq("id", id)
+      .eq("user_id", userId);
 
     if (!error) {
-      setWallets(prev => prev.map(w => {
-        if (w.id === id) {
-          return { ...w, ...updates, balance: newInitialBalance !== undefined ? newInitialBalance : w.balance };
-        }
-        return w;
-      }));
+      setWallets((prev) =>
+        prev.map((w) => {
+          if (w.id === id) {
+            return {
+              ...w,
+              ...updates,
+              balance:
+                newInitialBalance !== undefined ? newInitialBalance : w.balance,
+            };
+          }
+          return w;
+        }),
+      );
     }
   };
 
-  const addCategory = async (category: Omit<Category, 'id'>) => {
+  const addCategory = async (category: Omit<Category, "id">) => {
     if (!userId) return;
     const supabase = createClient();
     const dbCategory = {
@@ -206,28 +249,33 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
       color: category.color,
       icon: category.icon,
       limit_amount: category.limit,
-      user_id: userId
+      user_id: userId,
     };
-    
+
     const { data, error } = await supabase
-      .from('categories')
+      .from("categories")
       .insert(dbCategory)
       .select()
       .single();
 
     if (data && !error) {
-      setCategories(prev => [...prev, {
-        id: data.id,
-        name: data.name,
-        type: data.type,
-        limit: data.limit_amount,
-        color: data.color,
-        icon: data.icon
-      }]);
+      setCategories((prev) => [
+        ...prev,
+        {
+          id: data.id,
+          name: data.name,
+          type: data.type,
+          limit: data.limit_amount,
+          color: data.color,
+          icon: data.icon,
+        },
+      ]);
     }
   };
 
-  const addTransaction = async (transaction: Omit<Transaction, 'id'> & { date?: string }) => {
+  const addTransaction = async (
+    transaction: Omit<Transaction, "id"> & { date?: string },
+  ) => {
     if (!userId) return;
     const supabase = createClient();
     const date = transaction.date || new Date().toISOString();
@@ -240,34 +288,37 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
       wallet_id: transaction.walletId,
       date,
       notes: transaction.notes,
-      user_id: userId
+      user_id: userId,
     };
 
     const { data, error } = await supabase
-      .from('transactions')
+      .from("transactions")
       .insert(dbTx)
       .select()
       .single();
 
     if (data && !error) {
-      setTransactions(prev => [{
-        id: data.id,
-        title: data.title,
-        amount: data.amount,
-        type: data.type,
-        categoryId: data.category_id,
-        walletId: data.wallet_id,
-        date: data.date,
-        notes: data.notes
-      }, ...prev]);
+      setTransactions((prev) => [
+        {
+          id: data.id,
+          title: data.title,
+          amount: data.amount,
+          type: data.type,
+          categoryId: data.category_id,
+          walletId: data.wallet_id,
+          date: data.date,
+          notes: data.notes,
+        },
+        ...prev,
+      ]);
     }
   };
 
   return (
-    <FinanceContext.Provider 
-      value={{ 
-        wallets: computedWallets, 
-        categories, 
+    <FinanceContext.Provider
+      value={{
+        wallets: computedWallets,
+        categories,
         transactions,
         totalBalance,
         totalIncome,
@@ -275,7 +326,7 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
         addWallet,
         updateWallet,
         addCategory,
-        addTransaction
+        addTransaction,
       }}
     >
       {children}
@@ -286,7 +337,7 @@ export const FinanceProvider = ({ children }: { children: ReactNode }) => {
 export const useFinance = () => {
   const context = useContext(FinanceContext);
   if (context === undefined) {
-    throw new Error('useFinance must be used within a FinanceProvider');
+    throw new Error("useFinance must be used within a FinanceProvider");
   }
   return context;
 };

@@ -1,24 +1,32 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import dynamic from 'next/dynamic';
-import { TransactionItem, IosSheet } from '@/components/molecules';
-import { useFinance, useMasking, usePreferences } from '@/contexts';
-import { cn } from '@/lib/utils';
-import { Funnel, Calendar } from '@phosphor-icons/react';
+import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
+import { TransactionItem, IosSheet } from "@/components/molecules";
+import { useFinance, useMasking, usePreferences } from "@/contexts";
+import { cn } from "@/lib/utils";
+import { Funnel, Calendar } from "@phosphor-icons/react";
 
 const ExpenseChart = dynamic(
-  () => import('@/components/organisms/ExpenseChart').then(mod => ({ default: mod.ExpenseChart })),
-  { ssr: false }
+  () =>
+    import("@/components/organisms/ExpenseChart").then((mod) => ({
+      default: mod.ExpenseChart,
+    })),
+  { ssr: false },
 );
 
 const CategoryPieChart = dynamic(
-  () => import('@/components/organisms/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
-  { ssr: false }
+  () =>
+    import("@/components/organisms/CategoryPieChart").then((mod) => ({
+      default: mod.CategoryPieChart,
+    })),
+  { ssr: false },
 );
 
 export default function ExpensesPage() {
-  const [activeTab, setActiveTab] = useState<'Day' | 'Week' | 'Month' | 'Year'>('Week');
+  const [activeTab, setActiveTab] = useState<"Day" | "Week" | "Month" | "Year">(
+    "Week",
+  );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { transactions, categories } = useFinance();
   const { isVisible } = useMasking();
@@ -26,16 +34,20 @@ export default function ExpensesPage() {
 
   const TOP_SPENDING = useMemo(() => {
     return transactions
-      .filter(t => t.type === 'expense')
+      .filter((t) => t.type === "expense")
       .sort((a, b) => b.amount - a.amount)
       .slice(0, 5)
-      .map(t => {
-        const category = categories.find(c => c.id === t.categoryId);
+      .map((t) => {
+        const category = categories.find((c) => c.id === t.categoryId);
         const dateObj = new Date(t.date);
         return {
           ...t,
-          categoryName: category?.name || 'Unknown',
-          formattedDate: dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          categoryName: category?.name || "Unknown",
+          formattedDate: dateObj.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
         };
       });
   }, [transactions, categories]);
@@ -43,23 +55,28 @@ export default function ExpensesPage() {
   return (
     <>
       <div className="space-y-6">
-        
         {/* Header & Filters */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-white/80">
             <Calendar size={20} weight="duotone" />
             <span className="font-medium">
-              {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              {new Date().toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
             </span>
           </div>
-          <button onClick={() => setIsFilterOpen(true)} className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/10 transition-colors">
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/80 hover:bg-white/10 transition-colors"
+          >
             <Funnel size={18} weight="fill" />
           </button>
         </div>
 
         {/* Date Filter Tabs */}
         <div className="flex bg-[#1C1C1E]/70 p-1 rounded-2xl backdrop-blur-md border border-white/10">
-          {(['Day', 'Week', 'Month', 'Year'] as const).map((tab) => (
+          {(["Day", "Week", "Month", "Year"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -67,7 +84,7 @@ export default function ExpensesPage() {
                 "flex-1 text-center py-2 text-[14px] font-medium transition-colors",
                 activeTab === tab
                   ? "text-white bg-white/10 rounded-xl shadow-sm"
-                  : "text-white/50 hover:text-white"
+                  : "text-white/50 hover:text-white",
               )}
             >
               {tab}
@@ -86,13 +103,17 @@ export default function ExpensesPage() {
         </section>
 
         {/* Top Spending List */}
-        <section className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl rounded-[24px] border border-white/10 shadow-2xl overflow-hidden pb-2">
-          <div className="p-6 pb-2">
-            <h3 className="text-white/80 text-[15px] font-semibold tracking-tight">Top Spending</h3>
+        <section className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl rounded-[20px] border border-white/10 shadow-2xl overflow-hidden pb-2">
+          <div className="p-5 pb-2">
+            <h3 className="text-white/80 text-[15px] font-semibold tracking-tight">
+              Top Spending
+            </h3>
           </div>
           <div className="flex flex-col">
             {TOP_SPENDING.length === 0 ? (
-              <div className="py-4 text-center text-white/40 text-sm">No expenses yet.</div>
+              <div className="py-4 text-center text-white/40 text-sm">
+                No expenses yet.
+              </div>
             ) : (
               TOP_SPENDING.map((trx) => (
                 <TransactionItem
@@ -109,12 +130,15 @@ export default function ExpensesPage() {
             )}
           </div>
         </section>
-
       </div>
 
-      <IosSheet isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} title="Filter Transactions">
+      <IosSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        title="Filter Transactions"
+      >
         <div className="space-y-6">
-          <div className="bg-[#1C1C1E] border border-white/5 rounded-[24px] overflow-hidden">
+          <div className="bg-[#1C1C1E] border border-white/5 rounded-[20px] overflow-hidden">
             <div className="flex flex-col gap-2 p-5">
               <label className="text-[13px] text-white/50">Sort By</label>
               <select className="bg-transparent text-white text-[17px] outline-none">
@@ -128,13 +152,15 @@ export default function ExpensesPage() {
               <label className="text-[13px] text-white/50">Category</label>
               <select className="bg-transparent text-white text-[17px] outline-none">
                 <option value="all">All Categories</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => setIsFilterOpen(false)}
             className="w-full py-4 bg-emerald-500 text-white font-semibold rounded-[16px] hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
           >
@@ -142,7 +168,6 @@ export default function ExpensesPage() {
           </button>
         </div>
       </IosSheet>
-
     </>
   );
 }

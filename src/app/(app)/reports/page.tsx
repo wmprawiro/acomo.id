@@ -1,26 +1,32 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import { cn } from "@/lib/utils";
 
 const ExpenseChart = dynamic(
-  () => import('@/components/organisms/ExpenseChart').then(mod => ({ default: mod.ExpenseChart })),
-  { ssr: false }
+  () =>
+    import("@/components/organisms/ExpenseChart").then((mod) => ({
+      default: mod.ExpenseChart,
+    })),
+  { ssr: false },
 );
 
 const CategoryPieChart = dynamic(
-  () => import('@/components/organisms/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
-  { ssr: false }
+  () =>
+    import("@/components/organisms/CategoryPieChart").then((mod) => ({
+      default: mod.CategoryPieChart,
+    })),
+  { ssr: false },
 );
 
 export default function ReportsPage() {
-  const [activeTab, setActiveTab] = useState<'Week' | 'Month' | 'Year'>('Week');
+  const [activeTab, setActiveTab] = useState<"Week" | "Month" | "Year">("Week");
 
   const tabs = [
-    { label: 'Weekly', value: 'Week' },
-    { label: 'Monthly', value: 'Month' },
-    { label: 'Yearly', value: 'Year' },
+    { label: "Weekly", value: "Week" },
+    { label: "Monthly", value: "Month" },
+    { label: "Yearly", value: "Year" },
   ] as const;
 
   return (
@@ -35,7 +41,7 @@ export default function ReportsPage() {
               "flex-1 py-1.5 rounded-md text-sm transition-colors",
               activeTab === tab.value
                 ? "bg-[#2C2C2E] font-semibold text-white shadow-sm"
-                : "font-medium text-white/50 hover:text-white"
+                : "font-medium text-white/50 hover:text-white",
             )}
           >
             {tab.label}
@@ -45,14 +51,18 @@ export default function ReportsPage() {
 
       <section>
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">Trends</h3>
+          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">
+            Trends
+          </h3>
         </div>
         <ExpenseChart period={activeTab} />
       </section>
 
       <section>
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">Categories</h3>
+          <h3 className="text-[15px] font-semibold text-white/80 tracking-tight">
+            Categories
+          </h3>
         </div>
         <CategoryPieChart period={activeTab} />
       </section>
