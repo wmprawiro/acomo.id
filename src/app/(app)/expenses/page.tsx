@@ -1,11 +1,21 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ExpenseChart, CategoryPieChart } from '@/components/organisms';
+import dynamic from 'next/dynamic';
 import { TransactionItem, IosSheet } from '@/components/molecules';
 import { useFinance, useMasking, usePreferences } from '@/contexts';
 import { cn } from '@/lib/utils';
 import { Funnel, Calendar } from '@phosphor-icons/react';
+
+const ExpenseChart = dynamic(
+  () => import('@/components/organisms/ExpenseChart').then(mod => ({ default: mod.ExpenseChart })),
+  { ssr: false }
+);
+
+const CategoryPieChart = dynamic(
+  () => import('@/components/organisms/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
+  { ssr: false }
+);
 
 export default function ExpensesPage() {
   const [activeTab, setActiveTab] = useState<'Day' | 'Week' | 'Month' | 'Year'>('Week');

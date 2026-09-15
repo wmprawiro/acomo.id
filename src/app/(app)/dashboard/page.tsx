@@ -1,5 +1,19 @@
-import { DashboardStats, TransactionList, ExpenseChart, CategoryPieChart, WalletCarousel } from '@/components/organisms';
+'use client';
+
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { DashboardStats, TransactionList, WalletCarousel } from '@/components/organisms';
+
+// Disable SSR for chart components — they use Recharts which accesses browser APIs
+const ExpenseChart = dynamic(
+  () => import('@/components/organisms/ExpenseChart').then(mod => ({ default: mod.ExpenseChart })),
+  { ssr: false }
+);
+
+const CategoryPieChart = dynamic(
+  () => import('@/components/organisms/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
+  { ssr: false }
+);
 
 export default function DashboardPage() {
   return (

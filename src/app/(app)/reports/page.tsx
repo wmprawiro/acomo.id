@@ -1,8 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { ExpenseChart, CategoryPieChart } from '@/components/organisms';
+import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
+
+const ExpenseChart = dynamic(
+  () => import('@/components/organisms/ExpenseChart').then(mod => ({ default: mod.ExpenseChart })),
+  { ssr: false }
+);
+
+const CategoryPieChart = dynamic(
+  () => import('@/components/organisms/CategoryPieChart').then(mod => ({ default: mod.CategoryPieChart })),
+  { ssr: false }
+);
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'Week' | 'Month' | 'Year'>('Week');
