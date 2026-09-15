@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import {
   CaretRight,
   CurrencyCircleDollar,
@@ -40,8 +41,15 @@ export default function ProfilePage() {
     setNotifications,
   } = usePreferences();
   const { wallets, categories, addWallet, addCategory } = useFinance();
+  const router = useRouter();
   const [isCurrencySheetOpen, setIsCurrencySheetOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.replace('/login');
+  };
 
   const [newWallet, setNewWallet] = useState({
     name: "",
@@ -302,8 +310,8 @@ export default function ProfilePage() {
 
       {/* Card 4: Log Out */}
       <div className="bg-gradient-to-br from-[#1C1C1E]/70 to-[#2C2C2E]/70 backdrop-blur-2xl rounded-[20px] overflow-hidden border border-white/10 shadow-2xl">
-        <Link
-          href="/logout"
+        <div
+          onClick={handleLogout}
           className="flex items-center justify-between p-5 hover:bg-white/5 transition-colors cursor-pointer"
         >
           <div className="flex items-center gap-3.5">
@@ -314,7 +322,7 @@ export default function ProfilePage() {
               Log Out
             </span>
           </div>
-        </Link>
+        </div>
       </div>
 
       {/* Card 5: Delete Account */}
