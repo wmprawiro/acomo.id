@@ -24,7 +24,7 @@ export const Hero: React.FC = () => {
           <img
             alt="hero graphic"
             className="w-full h-auto md:w-auto md:max-h-[850px] object-contain"
-            src="/assets/image-1.png"
+            src="/assets/mockup.png"
           />
         </div>
       </Container>
