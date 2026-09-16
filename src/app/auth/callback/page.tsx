@@ -36,7 +36,7 @@ export default function AuthCallback() {
           setTimeout(() => {
             subscription.unsubscribe();
             if (!data.session) {
-              router.replace("/login?error=Could not complete authentication");
+              router.replace("/?error=Could not complete authentication");
             }
           }, 5000);
         }
@@ -47,7 +47,7 @@ export default function AuthCallback() {
         setError(errorMessage);
         setTimeout(
           () =>
-            router.replace("/login?error=" + encodeURIComponent(errorMessage)),
+            router.replace("/?error=" + encodeURIComponent(errorMessage)),
           3000,
         );
       }

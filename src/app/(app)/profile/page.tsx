@@ -48,7 +48,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.replace('/login');
+    router.replace('/');
   };
 
   const [newWallet, setNewWallet] = useState({
